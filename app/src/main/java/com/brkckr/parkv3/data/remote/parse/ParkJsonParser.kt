@@ -4,6 +4,7 @@ import com.brkckr.parkv3.domain.model.GeoPoint
 import com.brkckr.parkv3.domain.model.Park
 import com.brkckr.parkv3.domain.model.ParkDetail
 import com.brkckr.parkv3.domain.model.SourceTimestamp
+import com.brkckr.parkv3.domain.model.TariffLine
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
@@ -26,12 +27,17 @@ sealed interface ListParseResult {
     data object NotAnArray : ListParseResult
 }
 
-/** Detail parse output; [rawAreaPolygon] is kept verbatim and never interpreted (ADR-0003). */
-data class ParsedDetail(val detail: ParkDetail, val rawAreaPolygon: String?)
+/**
+ * Detail parse output. [rawTariff] is stored so lines can be re-derived; [rawAreaPolygon] is
+ * kept verbatim and never interpreted in v1 (ADR-0003).
+ */
+data class ParsedDetail(val detail: ParkDetail, val rawTariff: String?, val rawAreaPolygon: String?)
 
 sealed interface DetailParseResult {
     data class Parsed(val value: ParsedDetail) : DetailParseResult
-    data object Empty : DetailParseResult
+
+    /** Empty array, or the placeholder record (parkID 0) the source returns for unknown ids. */
+    data object NotFound : DetailParseResult
     data object Malformed : DetailParseResult
 }
 
@@ -64,42 +70,57 @@ object ParkJsonParser {
         return ListParseResult.Parsed(parks, skipped, duplicates)
     }
 
-    /** ParkDetay is expected to be an array with one element; a bare object is accepted too. */
-    fun parseDetail(root: JsonElement, fetchedAtMillis: Long): DetailParseResult {
+    /**
+     * ParkDetay is an array with one element (a bare object is accepted too). For an unknown
+     * id the source answers 200 with a placeholder record whose parkID is 0 and whose
+     * capacity values are 1; that must never be stored as real data.
+     */
+    fun parseDetail(root: JsonElement, requestedId: Int, fetchedAtMillis: Long): DetailParseResult {
         val obj = when (root) {
             is JsonArray -> {
-                if (root.isEmpty()) return DetailParseResult.Empty
+                if (root.isEmpty()) return DetailParseResult.NotFound
                 root.first() as? JsonObject ?: return DetailParseResult.Malformed
             }
             is JsonObject -> root
             else -> return DetailParseResult.Malformed
         }
         val f = JsonFields(obj)
-        val id = parkId(f) ?: return DetailParseResult.Malformed
+        val id = f.int("parkID", "parkId", "id")
+        if (id == null || id <= 0 || id != requestedId) return DetailParseResult.NotFound
+        val tariff = f.string("tariff")
         val detail = ParkDetail(
             parkId = id,
             name = f.string("parkName"),
             district = f.string("district"),
             address = f.string("address"),
-            phone = f.string("phone"),
             parkType = f.string("parkType"),
             workHours = f.string("workHours"),
             location = location(f),
-            openState = f.openState("isOpen"),
             capacity = f.int("capacity"),
             emptyCapacity = f.int("emptyCapacity"),
-            freeTime = f.string("freeTime"),
-            fee = f.string("fee"),
-            monthlyFee = f.string("monthlyFee"),
-            tariffLines = tariffLines(f.string("tariff")),
+            freeTime = f.int("freeTime"),
+            monthlyFee = f.double("monthlyFee"),
+            tariffLines = tariffLines(tariff),
             sourceUpdatedAt = f.string("updateDate")?.let(::parseSourceTimestamp),
             fetchedAtMillis = fetchedAtMillis,
         )
-        return DetailParseResult.Parsed(ParsedDetail(detail, f.string("areaPolygon")))
+        return DetailParseResult.Parsed(ParsedDetail(detail, tariff, f.string("areaPolygon")))
     }
 
-    fun tariffLines(raw: String?): List<String> =
-        raw?.split(';', '\n')?.map { it.trim() }?.filter { it.isNotEmpty() }.orEmpty()
+    /** "0-1 Saat : 110,00;Tam Gün : 370,00" → lines split at ';' and then at the first ':'. */
+    fun tariffLines(raw: String?): List<TariffLine> =
+        raw?.split(';', '\n')
+            ?.map { it.trim() }
+            ?.filter { it.isNotEmpty() }
+            ?.map { line ->
+                val colon = line.indexOf(':')
+                if (colon <= 0) {
+                    TariffLine(line, null)
+                } else {
+                    TariffLine(line.substring(0, colon).trim(), line.substring(colon + 1).trim().ifEmpty { null })
+                }
+            }
+            .orEmpty()
 
     fun parseSourceTimestamp(raw: String): SourceTimestamp {
         val text = raw.trim()
@@ -134,9 +155,7 @@ object ParkJsonParser {
             emptyCapacity = f.int("emptyCapacity"),
             workHours = f.string("workHours"),
             parkType = f.string("parkType"),
-            freeTime = f.string("freeTime"),
-            fee = f.string("fee"),
-            monthlyFee = f.string("monthlyFee"),
+            freeTime = f.int("freeTime"),
         )
     }
 

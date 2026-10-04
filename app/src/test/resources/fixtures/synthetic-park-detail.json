@@ -1,0 +1,20 @@
+[
+  {
+    "locationName": "9999 Kadıköy Rıhtım Otoparkı",
+    "parkID": 101,
+    "parkName": "Kadıköy Rıhtım Otoparkı",
+    "lat": "40.9903",
+    "lng": "29.0236",
+    "capacity": 200,
+    "emptyCapacity": 33,
+    "updateDate": "04.10.2026 14:02:30",
+    "workHours": "24 Saat",
+    "parkType": "AÇIK OTOPARK",
+    "freeTime": 15,
+    "monthlyFee": 2500.0,
+    "tariff": "0-1 Saat : 40,00;1-2 Saat : 60,00; ;Tam Gün : 200,00;Engelli araçlar ücretsizdir",
+    "district": "KADIKÖY",
+    "address": "Rıhtım Cad. No:1 Kadıköy/İstanbul",
+    "areaPolygon": "POLYGON ((29.0230 40.9900, 29.0240 40.9900, 29.0240 40.9910, 29.0230 40.9900))"
+  }
+]

@@ -1,8 +1,10 @@
 # ADR-0003: Toleranslı ayrıştırma ve veri doğruluğu kuralları
 
 ## Bağlam
-Kaynak şeması resmî olarak belgelenmemiş ve canlı olarak doğrulanamadı
-([API_CONTRACT.md](../API_CONTRACT.md)). Alanlar sayı, metin veya null gelebilir.
+Kaynak şeması resmî olarak belgelenmemiş. 2026-10-04 tarihli canlı ölçüm
+([API_CONTRACT.md](../API_CONTRACT.md)) koordinatların metin, `monthlyFee` değerinin float
+geldiğini, `updateDate` alanının bazen null olduğunu ve bilinmeyen id için sahte bir kayıt
+döndüğünü gösterdi. Tipler zamanla değişebilir.
 
 ## Karar
 - Yanıt önce `JsonElement` olarak alınıyor (kotlinx.serialization). Her alan, tip
@@ -21,8 +23,14 @@ Kaynak şeması resmî olarak belgelenmemiş ve canlı olarak doğrulanamadı
 - **Koordinat**: Sonlu, (0,0) olmayan ve İstanbul kutusu içinde olan değerler geçerli.
   Geçersiz kayıt listede "Konum bilgisi yok" etiketiyle görünüyor, haritada gösterilmiyor.
   Enlem ile boylam büyüklüğe bakılarak yer değiştirilmiyor.
-- **Ücret**: `fee`, `monthlyFee`, `freeTime` ve `tariff` ham metin olarak taşınıyor. Süre
-  birimi doğrulanmadığı için "saatlik" etiketi kullanılmıyor.
+- **Ücret**: Canlı kaynakta `fee` alanı yok. Fiyat bilgisi yalnızca detaydaki serbest metin
+  `tariff` alanında (`"0-1 Saat : 110,00;…"`). Satırlar olduğu gibi gösteriliyor. Hiçbir
+  değere "saatlik ücret" etiketi konmuyor, para birimi eklenmiyor. `monthlyFee` yalnızca
+  `> 0` ise gösteriliyor. `0.0` "ücretsiz" sayılmıyor, çünkü bilinmeyen id yanıtı da `0.0`
+  dönüyor. `freeTime` birimi belgelenmediği için ham sayı olarak gösteriliyor.
+- **Sahte kayıt**: `ParkDetay` bilinmeyen id için `parkID: 0, capacity: 1, emptyCapacity: 1`
+  içeren bir kayıt dönüyor. `parkID` istenen id'ye eşit değilse yanıt "bulunamadı" sayılıyor
+  ve önbelleğe yazılmıyor.
 - **Poligon**: `areaPolygon` ham olarak saklanıyor, v1'de çizilmiyor. Çizim için WKT
   standardındaki (X=boylam, Y=enlem) sıranın canlı veriyle doğrulanması gerekiyor (backlog).
 - Kimliği geçersiz kayıtlar atlanıp sayılıyor. Aynı kimlik birden fazla gelirse ilk kayıt

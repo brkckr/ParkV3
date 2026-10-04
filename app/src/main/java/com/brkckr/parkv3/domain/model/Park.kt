@@ -16,9 +16,8 @@ data class Park(
     val emptyCapacity: Int?,
     val workHours: String?,
     val parkType: String?,
-    val freeTime: String?,
-    val fee: String?,
-    val monthlyFee: String?,
+    /** Free parking time as reported; the source does not document the unit. */
+    val freeTime: Int?,
 ) {
     val occupancy: Occupancy get() = Occupancy.of(capacity, emptyCapacity)
     val availability: Availability get() = Availability.of(openState, occupancy)

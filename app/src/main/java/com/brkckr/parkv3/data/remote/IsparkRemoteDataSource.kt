@@ -36,7 +36,7 @@ class IsparkRemoteDataSource @Inject constructor(private val api: IsparkApi) {
         call { ParkJsonParser.parseList(api.parks()) }
 
     suspend fun fetchDetail(parkId: Int, fetchedAtMillis: Long): RemoteResult<DetailParseResult> =
-        call { ParkJsonParser.parseDetail(api.parkDetail(parkId), fetchedAtMillis) }
+        call { ParkJsonParser.parseDetail(api.parkDetail(parkId), parkId, fetchedAtMillis) }
 
     private inline fun <T> call(block: () -> T): RemoteResult<T> = try {
         RemoteResult.Success(block())
