@@ -42,7 +42,7 @@ class IsparkRemoteDataSourceTest {
         server.enqueue(MockResponse.Builder().code(code).setHeader("Content-Type", contentType).body(body).build())
 
     @Test
-    fun `list response is fetched from the Park path and parsed`() = runBlocking {
+    fun `list response is fetched from the Park path and parsed`() = runBlocking<Unit> {
         respond(200, Fixtures.parkList)
 
         val result = dataSource.fetchParks()
@@ -53,7 +53,7 @@ class IsparkRemoteDataSourceTest {
     }
 
     @Test
-    fun `detail request sends the park id as query parameter`() = runBlocking {
+    fun `detail request sends the park id as query parameter`() = runBlocking<Unit> {
         respond(200, Fixtures.parkDetail)
 
         val result = dataSource.fetchDetail(parkId = 101, fetchedAtMillis = 5L)
@@ -65,14 +65,14 @@ class IsparkRemoteDataSourceTest {
     }
 
     @Test
-    fun `HTTP errors keep only the status code even with hostile bodies`() = runBlocking {
+    fun `HTTP errors keep only the status code even with hostile bodies`() = runBlocking<Unit> {
         respond(503, "<html>%s %d %1\$s ${"x".repeat(10_000)}</html>", contentType = "text/html")
 
         assertThat(dataSource.fetchParks()).isEqualTo(RemoteResult.Failure(RefreshError.Http(503)))
     }
 
     @Test
-    fun `a 200 response with an HTML page never yields park records`() = runBlocking {
+    fun `a 200 response with an HTML page never yields park records`() = runBlocking<Unit> {
         // kotlinx reads an unquoted token as a JSON literal; the list parser then reports it as
         // not an array, which ListSyncPolicy rejects as Malformed.
         respond(200, "<html>bakımdayız</html>", contentType = "text/html")
@@ -83,28 +83,28 @@ class IsparkRemoteDataSourceTest {
     }
 
     @Test
-    fun `an empty 200 body is malformed`() = runBlocking {
+    fun `an empty 200 body is malformed`() = runBlocking<Unit> {
         respond(200, "")
 
         assertThat(dataSource.fetchParks()).isEqualTo(RemoteResult.Failure(RefreshError.Malformed))
     }
 
     @Test
-    fun `a dropped connection is a network error`() = runBlocking {
+    fun `a dropped connection is a network error`() = runBlocking<Unit> {
         server.enqueue(MockResponse.Builder().onRequestStart(SocketEffect.CloseSocket()).build())
 
         assertThat(dataSource.fetchParks()).isEqualTo(RemoteResult.Failure(RefreshError.Network))
     }
 
     @Test
-    fun `an unreachable server is a network error`() = runBlocking {
+    fun `an unreachable server is a network error`() = runBlocking<Unit> {
         server.close()
 
         assertThat(dataSource.fetchParks()).isEqualTo(RemoteResult.Failure(RefreshError.Network))
     }
 
     @Test
-    fun `cancellation propagates instead of becoming a network error`() = runBlocking {
+    fun `cancellation propagates instead of becoming a network error`() = runBlocking<Unit> {
         server.enqueue(MockResponse.Builder().headersDelay(10, TimeUnit.SECONDS).body("[]").build())
 
         val call = async(Dispatchers.IO, start = CoroutineStart.UNDISPATCHED) { dataSource.fetchParks() }

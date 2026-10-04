@@ -9,6 +9,10 @@ import com.brkckr.parkv3.data.remote.IsparkApi
 import com.brkckr.parkv3.data.remote.IsparkApiFactory
 import com.brkckr.parkv3.domain.ParkRepository
 import com.brkckr.parkv3.domain.model.Clock
+import com.brkckr.parkv3.location.FusedLocationProvider
+import com.brkckr.parkv3.location.LocationProvider
+import com.brkckr.parkv3.ui.map.MapAvailability
+import com.brkckr.parkv3.ui.map.PlayServicesMapAvailability
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -85,6 +89,12 @@ interface BindingsModule {
 
     @Binds
     fun bindParkRepository(impl: OfflineFirstParkRepository): ParkRepository
+
+    @Binds
+    fun bindLocationProvider(impl: FusedLocationProvider): LocationProvider
+
+    @Binds
+    fun bindMapAvailability(impl: PlayServicesMapAvailability): MapAvailability
 
     /** Debug builds contribute a logger (src/debug); release builds contribute nothing. */
     @Multibinds

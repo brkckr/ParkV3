@@ -68,7 +68,7 @@ class OfflineFirstParkRepositoryTest {
     private suspend fun awaitRequest() = withContext(Dispatchers.IO) { server.takeRequest(5, TimeUnit.SECONDS) }
 
     @Test
-    fun `without cache a network failure leaves no content and a retry succeeds`() = runBlocking {
+    fun `without cache a network failure leaves no content and a retry succeeds`() = runBlocking<Unit> {
         respond(code = 503, body = "<html>down</html>")
 
         assertThat(repository.refreshParks()).isEqualTo(RefreshResult.Failure(RefreshError.Http(503)))
@@ -84,7 +84,7 @@ class OfflineFirstParkRepositoryTest {
     }
 
     @Test
-    fun `with cache a failed refresh keeps content and the last success time and marks it stale`() = runBlocking {
+    fun `with cache a failed refresh keeps content and the last success time and marks it stale`() = runBlocking<Unit> {
         respond(body = Fixtures.parkList)
         repository.refreshParks()
         val successAt = clock.now
@@ -102,7 +102,7 @@ class OfflineFirstParkRepositoryTest {
     }
 
     @Test
-    fun `favorites changed while a refresh is in flight are kept`() = runBlocking {
+    fun `favorites changed while a refresh is in flight are kept`() = runBlocking<Unit> {
         respond(body = Fixtures.parkList)
         repository.refreshParks()
         repository.setFavorite(103, true)
@@ -118,7 +118,7 @@ class OfflineFirstParkRepositoryTest {
     }
 
     @Test
-    fun `an empty or malformed response never clears the cache`() = runBlocking {
+    fun `an empty or malformed response never clears the cache`() = runBlocking<Unit> {
         respond(body = Fixtures.parkList)
         repository.refreshParks()
 
@@ -133,7 +133,7 @@ class OfflineFirstParkRepositoryTest {
     }
 
     @Test
-    fun `a complete response hides vanished parks and keeps their favorites as orphans`() = runBlocking {
+    fun `a complete response hides vanished parks and keeps their favorites as orphans`() = runBlocking<Unit> {
         respond(body = Fixtures.parkList)
         repository.refreshParks()
         repository.setFavorite(103, true)
@@ -155,7 +155,7 @@ class OfflineFirstParkRepositoryTest {
     }
 
     @Test
-    fun `a sharp shrink keeps records that are missing from the response`() = runBlocking {
+    fun `a sharp shrink keeps records that are missing from the response`() = runBlocking<Unit> {
         respond(body = parkListJson(1..30))
         repository.refreshParks()
 
@@ -166,7 +166,7 @@ class OfflineFirstParkRepositoryTest {
     }
 
     @Test
-    fun `parks missing for more than 30 days are purged with their details but favorites remain`() = runBlocking {
+    fun `parks missing for more than 30 days are purged with their details but favorites remain`() = runBlocking<Unit> {
         respond(body = parkListJson(listOf(1, 2, 3)))
         repository.refreshParks()
         repository.setFavorite(3, true)
@@ -188,7 +188,7 @@ class OfflineFirstParkRepositoryTest {
     }
 
     @Test
-    fun `concurrent refreshes share a single request`() = runBlocking {
+    fun `concurrent refreshes share a single request`() = runBlocking<Unit> {
         respond(body = Fixtures.parkList, delayMillis = 300)
 
         val results = (1..3).map { async { repository.refreshParks() } }.awaitAll()
@@ -199,7 +199,7 @@ class OfflineFirstParkRepositoryTest {
     }
 
     @Test
-    fun `cancelling one waiting caller neither aborts the shared refresh nor records an error`() = runBlocking {
+    fun `cancelling one waiting caller neither aborts the shared refresh nor records an error`() = runBlocking<Unit> {
         respond(body = Fixtures.parkList, delayMillis = 300)
 
         val first = async { repository.refreshParks() }
@@ -213,7 +213,7 @@ class OfflineFirstParkRepositoryTest {
     }
 
     @Test
-    fun `cancellation of the refresh itself is not recorded as a network error`() = runBlocking {
+    fun `cancellation of the refresh itself is not recorded as a network error`() = runBlocking<Unit> {
         respond(body = Fixtures.parkList, delayMillis = 2_000)
 
         val refresh = async { runCatching { repository.refreshParks() } }
@@ -226,7 +226,7 @@ class OfflineFirstParkRepositoryTest {
     }
 
     @Test
-    fun `refresh if older than skips fresh data`() = runBlocking {
+    fun `refresh if older than skips fresh data`() = runBlocking<Unit> {
         respond(body = Fixtures.parkList)
         repository.refreshParks()
 
@@ -241,7 +241,7 @@ class OfflineFirstParkRepositoryTest {
     }
 
     @Test
-    fun `detail first failure then retry succeeds`() = runBlocking {
+    fun `detail first failure then retry succeeds`() = runBlocking<Unit> {
         respond(code = 500, body = "error")
 
         assertThat(repository.refreshDetail(101)).isEqualTo(RefreshResult.Failure(RefreshError.Http(500)))
@@ -258,7 +258,7 @@ class OfflineFirstParkRepositoryTest {
     }
 
     @Test
-    fun `placeholder detail for an unknown id is never cached`() = runBlocking {
+    fun `placeholder detail for an unknown id is never cached`() = runBlocking<Unit> {
         respond(body = Fixtures.parkDetailUnknownId)
 
         assertThat(repository.refreshDetail(999)).isEqualTo(RefreshResult.Failure(RefreshError.NotFound))
@@ -266,7 +266,7 @@ class OfflineFirstParkRepositoryTest {
     }
 
     @Test
-    fun `a failed detail refresh keeps the cached detail`() = runBlocking {
+    fun `a failed detail refresh keeps the cached detail`() = runBlocking<Unit> {
         respond(body = Fixtures.parkDetail)
         repository.refreshDetail(101)
         val cached = repository.observeDetail(101).first()
@@ -279,7 +279,7 @@ class OfflineFirstParkRepositoryTest {
     }
 
     @Test
-    fun `concurrent detail refreshes for the same park share a request`() = runBlocking {
+    fun `concurrent detail refreshes for the same park share a request`() = runBlocking<Unit> {
         respond(body = Fixtures.parkDetail, delayMillis = 300)
 
         val results = (1..2).map { async { repository.refreshDetail(101) } }.awaitAll()
