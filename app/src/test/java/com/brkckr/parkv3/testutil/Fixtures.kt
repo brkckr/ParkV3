@@ -38,3 +38,16 @@ fun park(
     parkType = null,
     freeTime = null,
 )
+
+/** Controllable clock for freshness and purge tests. */
+class MutableClock(var now: Long) : com.brkckr.parkv3.domain.model.Clock {
+    override fun nowMillis(): Long = now
+    fun advanceBy(millis: Long) {
+        now += millis
+    }
+}
+
+/** A minimal valid list body with ids [ids] (all open, consistent capacity, valid location). */
+fun parkListJson(ids: Iterable<Int>): String = ids.joinToString(prefix = "[", postfix = "]") { id ->
+    """{"parkID": $id, "parkName": "Otopark $id", "lat": "41.0${id % 10}", "lng": "29.0${id % 10}", "capacity": 100, "emptyCapacity": 10, "district": "TEST", "isOpen": 1}"""
+}
