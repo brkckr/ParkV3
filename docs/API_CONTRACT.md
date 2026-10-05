@@ -49,7 +49,7 @@ Kimlik doğrulama gerekmiyor (açık veri, CC BY 4.0). Hız sınırı belgelenme
 | `monthlyFee` | **float** | `3500.0`, `0.0` | `> 0` → "Aylık abonelik: 3.500,00". `0.0` ve eksik → "Belirtilmemiş". Bilinmeyen id yanıtı da `0.0` döndüğü için 0 "ücretsiz" olarak yorumlanmıyor |
 | `tariff` | string | `"0-1 Saat : 110,00;1-2 Saat : 140,00;…;Tam Gün : 370,00"` | `;` ile satırlara bölünür. Her satır ilk `:` işaretinden etiket ve değer olarak ayrılıp olduğu gibi gösterilir. Para birimi kaynakta yazmadığı için eklenmiyor |
 | `updateDate` | string **veya null** | `"05.10.2026 00:10:23"`, `null` | `dd.MM.yyyy HH:mm:ss`, Europe/Istanbul (ölçüm anı 21:12 UTC ile tutarlı). "Kaynak güncelleme zamanı" olarak ayrı gösterilir |
-| `areaPolygon` | string (WKT) | `"POLYGON ((29.0910 41.0251, 29.0920 41.0251, …))"` | Ölçülen örnekler WKT standardındaki X=boylam, Y=enlem sırasındaydı. Probe bunu her hafta değişen 20 kayıtlık bir örneklemde, poligonun kaydın kendi konumuna hangi sırada denk geldiğine bakarak kontrol ediyor. v1'de çizilmiyor, ham saklanıyor (backlog) |
+| `areaPolygon` | string (WKT) | `"POLYGON ((29.0910 41.0251, 29.0920 41.0251, …))"` | Ölçülen örnekler WKT standardındaki X=boylam, Y=enlem sırasındaydı. Probe bunu her hafta değişen 20 kayıtlık bir örneklemde, poligonun kaydın kendi konumuna hangi sırada denk geldiğine bakarak kontrol ediyor. Ham saklanıyor. Haritada seçili otopark için çiziliyor, ancak her noktası geçerliyse ve otoparkın konumuna 2 km'den yakınsa. Eksenler hiç yer değiştirilmiyor ([ADR-0012](adr/0012-alan-poligonlari.md)) |
 
 Detayda **`isOpen`, `fee` ve `phone` yok.** Detay ekranı açık/kapalı bilgisini listedeki kayıttan alıyor
 ve kendi zaman damgasıyla gösteriyor.

@@ -1,5 +1,6 @@
 package com.brkckr.parkv3.data.local
 
+import com.brkckr.parkv3.data.remote.parse.AreaPolygonParser
 import com.brkckr.parkv3.data.remote.parse.ParkJsonParser
 import com.brkckr.parkv3.data.remote.parse.ParsedDetail
 import com.brkckr.parkv3.domain.model.GeoPoint
@@ -60,22 +61,26 @@ fun ParsedDetail.toEntity() = ParkDetailEntity(
     fetchedAtMillis = detail.fetchedAtMillis,
 )
 
-fun ParkDetailEntity.toDomain() = ParkDetail(
-    parkId = parkId,
-    name = name,
-    district = district,
-    address = address,
-    parkType = parkType,
-    workHours = workHours,
-    location = GeoPoint.validOrNull(latitude, longitude),
-    capacity = capacity,
-    emptyCapacity = emptyCapacity,
-    freeTime = freeTime,
-    monthlyFee = monthlyFee,
-    tariffLines = ParkJsonParser.tariffLines(tariffRaw),
-    sourceUpdatedAt = sourceUpdatedRaw?.let { SourceTimestamp(it, sourceUpdatedAtMillis) },
-    fetchedAtMillis = fetchedAtMillis,
-)
+fun ParkDetailEntity.toDomain(): ParkDetail {
+    val location = GeoPoint.validOrNull(latitude, longitude)
+    return ParkDetail(
+        parkId = parkId,
+        name = name,
+        district = district,
+        address = address,
+        parkType = parkType,
+        workHours = workHours,
+        location = location,
+        capacity = capacity,
+        emptyCapacity = emptyCapacity,
+        freeTime = freeTime,
+        monthlyFee = monthlyFee,
+        tariffLines = ParkJsonParser.tariffLines(tariffRaw),
+        sourceUpdatedAt = sourceUpdatedRaw?.let { SourceTimestamp(it, sourceUpdatedAtMillis) },
+        fetchedAtMillis = fetchedAtMillis,
+        area = AreaPolygonParser.parse(areaPolygonRaw, location),
+    )
+}
 
 fun FavoriteEntity.toOrphan() = OrphanFavorite(parkId = parkId, name = nameSnapshot, district = districtSnapshot)
 

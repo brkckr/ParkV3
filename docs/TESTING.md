@@ -56,7 +56,9 @@ kaydın saklanmaması, yaklaşık konum, konum zaman aşımı, kalıcı izin red
 servisi, Türkçe arayüz, 2x yazı ölçeğinde dokunma hedefleri, bağlantı geri gelince
 yeniden deneme (`ReconnectionsTest`, `ListRefreshTriggersTest`,
 `ConnectivityNetworkMonitorTest`, `DetailViewModelTest`,
-`MainFlowTest.detailLoadsByItselfWhenTheConnectionComesBack`).
+`MainFlowTest.detailLoadsByItselfWhenTheConnectionComesBack`), alan poligonu: WKT sırası,
+yer değiştirmeme ve otoparkın konumuna yakınlık (`AreaPolygonParserTest`), seçili alanın
+haritaya gelmesi ve haritada seçimde eksik detayın bir kez indirilmesi (`MainViewModelTest`).
 
 ## İlkeler
 

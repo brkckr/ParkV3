@@ -1,9 +1,11 @@
 package com.brkckr.parkv3.ui.main
 
 import androidx.lifecycle.SavedStateHandle
+import com.brkckr.parkv3.domain.model.AreaPolygon
 import com.brkckr.parkv3.domain.model.FreshnessPolicy
 import com.brkckr.parkv3.domain.model.GeoPoint
 import com.brkckr.parkv3.domain.model.OpenState
+import com.brkckr.parkv3.domain.model.ParkDetail
 import com.brkckr.parkv3.domain.model.RefreshError
 import com.brkckr.parkv3.domain.model.RefreshResult
 import com.brkckr.parkv3.domain.model.SyncInfo
@@ -55,6 +57,12 @@ class MainViewModelTest {
     }
 
     private fun MainViewModel.ids() = uiState.value.items.map { it.park.id }
+
+    private fun detail(parkId: Int, area: List<AreaPolygon> = emptyList()) = ParkDetail(
+        parkId = parkId, name = null, district = null, address = null, parkType = null, workHours = null,
+        location = null, capacity = null, emptyCapacity = null, freeTime = null, monthlyFee = null,
+        tariffLines = emptyList(), sourceUpdatedAt = null, fetchedAtMillis = 0L, area = area,
+    )
 
     @Test
     fun `cold start asks the repository to refresh only if stale`() = runTest {
@@ -267,5 +275,47 @@ class MainViewModelTest {
         val vm = viewModel(mapStatus = MapStatus.NO_API_KEY)
         collect(vm)
         assertThat(vm.uiState.value.viewMode).isEqualTo(ViewMode.LIST)
+    }
+
+    @Test
+    fun `the selected park's area comes from its cached detail`() = runTest {
+        repository.parks.value = parks
+        val area = AreaPolygon(listOf(GeoPoint(40.9900, 29.0230), GeoPoint(40.9900, 29.0240), GeoPoint(40.9910, 29.0240)))
+        repository.details.value = mapOf(1 to detail(1, listOf(area)))
+        val vm = viewModel()
+        collect(vm)
+
+        vm.onSelectPark(1)
+        assertThat(vm.uiState.value.selectedArea).containsExactly(area)
+
+        vm.onSelectPark(2)
+        assertThat(vm.uiState.value.selectedArea).isEmpty()
+    }
+
+    @Test
+    fun `selecting a park on the map fetches its missing detail once`() = runTest {
+        repository.parks.value = parks
+        repository.details.value = mapOf(2 to detail(2))
+        val vm = viewModel(mapStatus = MapStatus.AVAILABLE) // opens on the map
+        collect(vm)
+
+        vm.onSelectPark(1)
+        vm.onSelectPark(1)
+        assertThat(repository.detailRefreshCalls).isEqualTo(1)
+
+        vm.onSelectPark(2) // already cached
+        assertThat(repository.detailRefreshCalls).isEqualTo(1)
+    }
+
+    @Test
+    fun `selecting in the list does not fetch details`() = runTest {
+        repository.parks.value = parks
+        val vm = viewModel(mapStatus = MapStatus.AVAILABLE)
+        collect(vm)
+        vm.onViewModeChange(ViewMode.LIST)
+
+        vm.onSelectPark(1)
+
+        assertThat(repository.detailRefreshCalls).isEqualTo(0)
     }
 }

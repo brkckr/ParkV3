@@ -13,3 +13,4 @@
 | [0009](0009-konum.md) | İsteğe bağlı konum ve durum modeli | Kabul |
 | [0010](0010-test-ve-ci.md) | Test stratejisi ve CI | Kabul |
 | [0011](0011-surum-secimi.md) | Kütüphane sürümlerinin seçimi | Kabul |
+| [0012](0012-alan-poligonlari.md) | Alan poligonları: WKT sırası, doğrulama ve çizim | Kabul |
