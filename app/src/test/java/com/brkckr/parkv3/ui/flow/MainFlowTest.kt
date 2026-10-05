@@ -3,6 +3,7 @@ package com.brkckr.parkv3.ui.flow
 import androidx.compose.ui.test.ComposeTimeoutException
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.ComposeTestRule
@@ -171,7 +172,10 @@ class MainFlowTest {
         composeRule.waitForIdle() // let the navigation transition finish before touching shared labels
         composeRule.onNodeWithText("0-1 Saat").assertExists()
         composeRule.onNodeWithContentDescription("Add to favorites").performClick()
-        composeRule.onNodeWithContentDescription("Remove from favorites").assertIsDisplayed()
+        // The write goes through Room on a background thread before the toggle flips.
+        composeRule.waitShowingTree("favorite to be saved") {
+            composeRule.onAllNodes(hasContentDescription("Remove from favorites")).fetchSemanticsNodes().isNotEmpty()
+        }
         composeRule.onNodeWithContentDescription("Back").performClick()
 
         // Favorites filter now combines with the others.
