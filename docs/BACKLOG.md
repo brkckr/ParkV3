@@ -9,8 +9,9 @@
 ## P2 — Ürün
 3. **Adres/yer araması** (hedefi adla seçmek). Places/Geocoding API ücretli. Maliyet ve
    hesap kararı gerektiriyor.
-4. **Harita erişilebilirliği.** TalkBack ile işaretlere gezinme. Bugün liste görünümü
-   erişilebilir alternatif.
+4. **Harita küme balonlarının erişilebilirliği.** İşaretler ekran okuyucuya ad, durum ve
+   doluluk veriyor. Küme balonlarının (birden çok otopark) etiketi yok. maps-compose'un küme
+   çizicisini özelleştirmek gerekiyor. Ayrıca TalkBack ile gerçek cihazda deneme.
 
 ## P3 — Mühendislik
 5. **Bağımlılık güncellemeleri.** `maps-compose` 9.x (çıkışı 2026-10-01),
@@ -23,6 +24,9 @@
 9. **Ekran sayısı artarsa modüllere ayırma** (`:core:data`, `:feature:map` vb.).
 
 ## Tamamlananlar
+- **Harita işaretlerinin ekran okuyucu metni** (eski P2 harita erişilebilirliği maddesinin
+  ilk kısmı). İşaret adı (adsız otoparkta yedek ad) ve "durum · doluluk" açıklaması, listedeki
+  metinlerle aynı.
 - **Uygulama içi dil seçimi** (eski P2 #4). Ana ekrandaki dil düğmesiyle Sistem dili, Türkçe
   veya English. Android 8–12'de de çalışıyor ([ADR-0013](adr/0013-uygulama-ici-dil.md)).
 - **Paylaşım** (eski P2 #6). Detay ekranından ad, adres ve harita bağlantısı sistem paylaşım

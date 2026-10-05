@@ -8,6 +8,7 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.brkckr.parkv3.R
@@ -85,14 +86,17 @@ fun distanceText(meters: Double): String = if (meters < 1_000) {
 
 @Composable
 @ReadOnlyComposable
-fun occupancyText(occupancy: Occupancy, capacity: Int?): String = when (occupancy) {
-    is Occupancy.Known -> pluralStringResource(R.plurals.occupancy_known, occupancy.empty, occupancy.empty, occupancy.capacity)
+fun occupancyText(occupancy: Occupancy, capacity: Int?): String = LocalResources.current.occupancyLabel(occupancy, capacity)
+
+/** Non-composable variant for text built outside composition (map pin descriptions). */
+fun Resources.occupancyLabel(occupancy: Occupancy, capacity: Int?): String = when (occupancy) {
+    is Occupancy.Known -> getQuantityString(R.plurals.occupancy_known, occupancy.empty, occupancy.empty, occupancy.capacity)
     Occupancy.Missing -> if (capacity != null && capacity > 0) {
-        stringResource(R.string.occupancy_capacity_only, capacity)
+        getString(R.string.occupancy_capacity_only, capacity)
     } else {
-        stringResource(R.string.occupancy_missing)
+        getString(R.string.occupancy_missing)
     }
-    is Occupancy.Inconsistent -> stringResource(R.string.occupancy_inconsistent)
+    is Occupancy.Inconsistent -> getString(R.string.occupancy_inconsistent)
 }
 
 /** "14:05 (3 minutes ago)"; older than a day shows the date as well. */
