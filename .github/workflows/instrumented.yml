@@ -52,7 +52,10 @@ jobs:
           profile: pixel_6
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          script: ./gradlew --stacktrace connectedDebugAndroidTest
+          # The action runs each line on its own.
+          script: |
+            bash .github/scripts/emulator-ready.sh
+            ./gradlew --stacktrace connectedDebugAndroidTest
       - name: Print device test failures
         if: always()
         run: |
@@ -68,6 +71,10 @@ jobs:
                           failed += 1
                           print(f"FAILED {case.get('classname')}.{case.get('name')}\n{(node.text or node.get('message') or '')[:4000]}\n")
           print(f"device tests: {total} run, {failed} failed")
+          # Gradle can end successfully when the APK never got installed; no tests is a failure.
+          if total == 0:
+              print("::error::No device tests ran")
+          raise SystemExit(1 if total == 0 or failed else 0)
           PY
       - name: Upload device test reports
         if: always()
