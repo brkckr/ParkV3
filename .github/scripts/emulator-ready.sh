@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Run on the booted emulator before the device tests. Waits until the package, activity and
-# storage services have answered shell commands for 30 s in a row: on the Android 17 image they
-# lag well behind boot_completed (`cmd package` fails with "Can't find service", and before the
-# storage service is up an install fails or the app gets no data directory). Then installs the
+# storage services have answered shell commands for 30 s in a row: they can lag behind
+# boot_completed (seen on the Android 17 image: `cmd package` failed with "Can't find service",
+# and before the storage service was up an install failed or the app got no data directory,
+# docs/adr/0015). Then installs the
 # debug APK once, because when installing fails, Gradle's connected task reports an empty
 # reason and ends successfully with no tests run; the reason is printed here instead.
 set -u
