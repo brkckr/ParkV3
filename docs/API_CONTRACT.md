@@ -93,8 +93,12 @@ bununla karşılaştırıyor.
   sayar), uygulamanın okuyamadığı `updateDate`, enlem-boylam sırasında bir `areaPolygon`,
   WKT olmayan poligonlar.
 - Bilinmeyen id için o id'ye ait bir kayıt dönmesi.
+- Sunucunun TLS sertifikasında 2'den az gömülü SCT. Android 17, targetSdk 37 olan uygulamada
+  sertifika şeffaflığını zorunlu tutuyor ([ADR-0015](adr/0015-target-sdk-37.md)). TLS uzantısı
+  veya OCSP ile gelen SCT'ler sayılmıyor. Araya giren bir TLS vekili de 0 olarak görünür,
+  bu yüzden rapor sertifikayı vereni de yazıyor.
 
-**Not (yalnızca raporda):** %5'in altındaki sapmalar, uygulamanın hâlâ okuyabildiği yeni bir
+**Not (yalnızca raporda):** sertifikanın okunamaması (TLS bağlantısı kurulamadı), %5'in altındaki sapmalar, uygulamanın hâlâ okuyabildiği yeni bir
 tarih biçimi, `etiket : değer` biçiminde olmayan tarife satırları, kaydın konumundan uzak
 poligonlar, bilinmeyen id davranışının değişmesi (ör. 404).
 

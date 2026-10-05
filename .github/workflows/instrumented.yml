@@ -1,7 +1,8 @@
 name: Instrumented tests
 
-# Device tests (Room schema/migration, main flow) on an emulator. Separate from the main CI
-# because an emulator run takes several minutes.
+# Device tests (Room schema/migration, main flow) on emulators. Separate from the main CI
+# because an emulator run takes several minutes. API 34 is the required check; API 37 runs
+# the app on Android 17 with its targetSdk 37 behavior changes (docs/adr/0015).
 on:
   pull_request:
   workflow_dispatch:
@@ -15,9 +16,19 @@ permissions:
 
 jobs:
   connected:
-    name: Emulator (API 34)
+    name: Emulator (API ${{ matrix.api-level }})
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - api-level: 34
+            sdk-level: "34"
+          # Since API 36.1 the SDK publishes platforms and system images under a minor
+          # version: there is no "android-37", only "android-37.0" (and later 37.x).
+          - api-level: 37
+            sdk-level: "37.0"
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-java@v5
@@ -35,7 +46,7 @@ jobs:
       - name: Run connected tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 34
+          api-level: ${{ matrix.sdk-level }}
           arch: x86_64
           target: google_apis
           profile: pixel_6
@@ -62,6 +73,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: instrumented-test-reports
+          name: instrumented-test-reports-api-${{ matrix.api-level }}
           path: app/build/reports/androidTests/
           if-no-files-found: ignore

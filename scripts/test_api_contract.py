@@ -33,6 +33,22 @@ def detail_record(pid):
     return r
 
 
+def der_length(n):
+    return bytes([n]) if n < 0x80 else bytes([0x80 | 2]) + n.to_bytes(2, "big")
+
+
+def certificate(scts, critical=False):
+    """A stand-in DER blob with the embedded SCT list extension laid out as in RFC 6962 3.3."""
+    entries = b""
+    for i in range(scts):
+        sct = bytes([0]) + bytes([i]) * 32 + bytes(8) + bytes(2) + bytes([4, 3]) + (71).to_bytes(2, "big") + bytes(71)
+        entries += len(sct).to_bytes(2, "big") + sct
+    tls = len(entries).to_bytes(2, "big") + entries
+    value = b"\x04" + der_length(len(tls)) + tls
+    extension = api_contract.SCT_LIST_OID + (b"\x01\x01\xff" if critical else b"") + b"\x04" + der_length(len(value)) + value
+    return b"\x30\x82\x04\x00" + bytes(40) + b"\x30" + der_length(len(extension)) + extension + bytes(16)
+
+
 class Probe:
     """One probe run's responses, built from records shaped like the measured ones."""
 
@@ -41,9 +57,10 @@ class Probe:
         self.details = {pid: (200, [detail_record(pid)]) for pid in range(1, 21)}
         self.unknown = (999999999, 200, [{"parkID": 0, "parkName": "", "capacity": 1, "emptyCapacity": 1}])
         self.list_status = 200
+        self.certificate = ("api.ibb.gov.tr", certificate(scts=3), "CN=Test CA")
 
     def run(self):
-        return check((self.list_status, self.list), self.details, self.unknown)
+        return check((self.list_status, self.list), self.details, self.unknown, self.certificate)
 
     def detail(self, pid):
         return self.details[pid][1][0]
@@ -105,6 +122,33 @@ class ContractTest(unittest.TestCase):
             result = probe.run()
             self.assertEqual(result.violations, [])
             self.assertEqual(result.notes, [])
+
+    def test_embedded_scts_are_counted(self):
+        for count in (0, 1, 2, 3):
+            self.assertEqual(api_contract.embedded_scts(certificate(count)), count)
+        self.assertEqual(api_contract.embedded_scts(certificate(2, critical=True)), 2)
+        self.assertEqual(api_contract.embedded_scts(b"\x30\x03\x02\x01\x01"), 0)  # no extension
+        # A cut-off extension is unreadable, not a crash.
+        self.assertEqual(api_contract.embedded_scts(api_contract.SCT_LIST_OID), 0)
+        self.assertLess(api_contract.embedded_scts(certificate(3)[:-200]), 3)
+
+    def test_certificate_without_enough_scts_is_a_violation(self):
+        probe = Probe()
+        probe.certificate = ("api.ibb.gov.tr", certificate(scts=1), "CN=Test CA")
+        self.assertIn("api.ibb.gov.tr: TLS certificate (issuer: CN=Test CA) embeds 1 SCT(s)", " ".join(probe.run().violations))
+
+        probe.certificate = ("api.ibb.gov.tr", b"\x30\x03\x02\x01\x01", "CN=Test CA")
+        self.assertIn("embeds 0 SCT(s)", " ".join(probe.run().violations))
+
+    def test_unreadable_or_unchecked_certificate_is_no_violation(self):
+        probe = Probe()
+        probe.certificate = ("api.ibb.gov.tr", None, None)  # TLS handshake failed
+        result = probe.run()
+        self.assertEqual(result.violations, [])
+        self.assertIn("certificate transparency not checked", " ".join(result.notes))
+
+        probe.certificate = None  # plain HTTP base URL for a local run
+        self.assertEqual(probe.run().notes, [])
 
     def test_detail_answering_another_id_is_a_violation(self):
         probe = Probe()

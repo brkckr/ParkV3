@@ -55,7 +55,8 @@ Cleartext izni yalnızca debug derlemesinde ve yalnızca `localhost` / `127.0.0.
 açık (`app/src/debug/res/xml/network_security_config.xml`). Testler Hilt test runner'ı
 (`com.brkckr.parkv3.HiltTestRunner`) ile çalışıyor.
 
-CI'da aynı testler `Instrumented tests` iş akışında, API 34 x86_64 emülatörde koşuyor.
+CI'da aynı testler `Instrumented tests` iş akışında iki x86_64 emülatörde koşuyor: API 34
+(zorunlu kontrol) ve API 37 (Android 17, targetSdk 37 davranışlarıyla, [ADR-0015](adr/0015-target-sdk-37.md)).
 
 ## İstenen senaryolar ve karşılayan testler
 
