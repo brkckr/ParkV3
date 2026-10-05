@@ -21,7 +21,10 @@ testleri bunları birlikte kullanıyor. Hiçbir test canlı API'ye gitmiyor. Can
 2. `./gradlew connectedDebugAndroidTest` çalıştırın.
 3. Rapor: `app/build/reports/androidTests/connected/index.html`.
 
-Testler debug APK'sını kullanıyor. Sahte sunucu `localhost` üzerinde HTTP ile çalışıyor.
+Testler debug APK'sını kullanıyor. Sahte sunucu `localhost` üzerinde HTTP ile çalışıyor ve
+test thread'inde başlatılıyor (`TestServer.reset()`, `@Before` içinde). Çevrimdışı durum
+gerçek bir bağlantı kesilmesiyle değil, Hilt ile eklenen ve `IOException` fırlatan bir
+OkHttp interceptor'ıyla (`FakeConnectivity.offline`) simüle ediliyor.
 Cleartext izni yalnızca debug derlemesinde ve yalnızca `localhost` / `127.0.0.1` için
 açık (`app/src/debug/res/xml/network_security_config.xml`). Testler Hilt test runner'ı
 (`com.brkckr.parkv3.HiltTestRunner`) ile çalışıyor.
@@ -33,7 +36,7 @@ CI'da aynı testler `Instrumented tests` iş akışında, API 34 x86_64 emülat�
 | # | Senaryo | Testler |
 |---|---|---|
 | 1 | Önbellek yokken ağ hatası, ardından başarılı yeniden deneme | `OfflineFirstParkRepositoryTest.without cache a network failure…`, `MainViewModelTest.without cache a network failure is an offline screen…`, `MainFlowTest.firstLaunchOffline_explainsAndRetryLoadsTheList` |
-| 2 | Önbellek varken ağ hatası: içerik korunur, eski olduğu belirtilir | `OfflineFirstParkRepositoryTest.with cache a failed refresh keeps content…`, `MainViewModelTest.with cache a failed refresh keeps the items…` |
+| 2 | Önbellek varken ağ hatası: içerik korunur, eski olduğu belirtilir | `OfflineFirstParkRepositoryTest.with cache a failed refresh keeps content…`, `MainViewModelTest.with cache a failed refresh keeps the items…`, `MainFlowTest.cachedListStaysWhenARefreshFails` |
 | 3 | Yenileme sırasında değiştirilen favori kaybolmaz | `OfflineFirstParkRepositoryTest.favorites changed while a refresh is in flight are kept` |
 | 4 | Detay ilk yükleme hatasından sonra yeniden deneme çalışır | `DetailViewModelTest.retry works after the first load fails`, `OfflineFirstParkRepositoryTest.detail first failure then retry succeeds`, `MainFlowTest.detailFirstLoadFailure_thenRetrySucceeds` |
 | 5 | Eksik `isOpen` ile açıkça kapalı durum ayrılır | `ParkJsonParserTest.explicit isOpen 0 is closed while missing isOpen is unknown`, `…isOpen values other than explicit true or false are unknown`, `DetailViewModelTest.missing isOpen stays unknown…`, `DomainRulesTest` |

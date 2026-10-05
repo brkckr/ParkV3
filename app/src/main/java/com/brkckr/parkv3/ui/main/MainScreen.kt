@@ -279,6 +279,7 @@ fun MainScreen(state: MainUiState, actions: MainActions, snackbarHostState: Snac
                     selectedParkId = state.selectedParkId,
                     isRefreshing = state.isRefreshing,
                     canShowOnMap = state.mapStatus == MapStatus.AVAILABLE,
+                    scrollResetKey = state.query to state.filters,
                     onRefresh = actions.onRefresh,
                     onOpenDetail = actions.onOpenDetail,
                     onShowOnMap = actions.onShowOnMap,

@@ -51,6 +51,8 @@ fun ParkList(
     selectedParkId: Int?,
     isRefreshing: Boolean,
     canShowOnMap: Boolean,
+    /** Changing search or filters starts the result list from the top. */
+    scrollResetKey: Any,
     onRefresh: () -> Unit,
     onOpenDetail: (Int) -> Unit,
     onShowOnMap: (Int) -> Unit,
@@ -58,6 +60,7 @@ fun ParkList(
     modifier: Modifier = Modifier,
 ) {
     val listState = rememberLazyListState()
+    LaunchedEffect(scrollResetKey) { listState.scrollToItem(0) }
     // Keep the shared selection visible when arriving from the map.
     LaunchedEffect(selectedParkId) {
         val index = items.indexOfFirst { it.park.id == selectedParkId }
