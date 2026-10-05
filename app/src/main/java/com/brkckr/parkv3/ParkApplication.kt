@@ -1,12 +1,11 @@
 package com.brkckr.parkv3
 
 import android.app.Application
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import com.brkckr.parkv3.domain.ParkRepository
-import com.brkckr.parkv3.domain.model.FreshnessPolicy
+import androidx.lifecycle.repeatOnLifecycle
+import com.brkckr.parkv3.data.sync.ListRefreshTriggers
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -15,17 +14,15 @@ import javax.inject.Inject
 class ParkApplication : Application() {
 
     @Inject
-    lateinit var repository: ParkRepository
+    lateinit var listRefreshTriggers: ListRefreshTriggers
 
     override fun onCreate() {
         super.onCreate()
-        // Staleness check whenever the app comes to the foreground (docs/adr/0005).
-        ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
-            override fun onStart(owner: LifecycleOwner) {
-                owner.lifecycleScope.launch {
-                    repository.refreshParksIfOlderThan(FreshnessPolicy.LIST_AUTO_REFRESH_AFTER_MS)
-                }
-            }
-        })
+        // Automatic refreshes only while the app is visible (docs/adr/0005). A refresh that is
+        // already running when the app goes to the background still completes and is saved.
+        val process = ProcessLifecycleOwner.get()
+        process.lifecycleScope.launch {
+            process.repeatOnLifecycle(Lifecycle.State.STARTED) { listRefreshTriggers.runWhileForeground() }
+        }
     }
 }

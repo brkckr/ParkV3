@@ -61,4 +61,16 @@ class DomainRulesTest {
         assertThat(FreshnessPolicy.isListStale(SyncInfo(lastSuccessAtMillis = now - 16 * 60_000), now)).isTrue()
         assertThat(FreshnessPolicy.isListStale(SyncInfo(), now)).isTrue()
     }
+
+    @Test
+    fun `reconnecting retries network failures and due refreshes but not server errors`() {
+        val now = 100_000_000L
+        val fresh = SyncInfo(lastSuccessAtMillis = now - 60_000)
+        assertThat(FreshnessPolicy.shouldRefreshListOnReconnect(fresh, now)).isFalse()
+        assertThat(FreshnessPolicy.shouldRefreshListOnReconnect(fresh.copy(lastError = RefreshError.Network), now)).isTrue()
+        assertThat(FreshnessPolicy.shouldRefreshListOnReconnect(fresh.copy(lastError = RefreshError.Http(503)), now)).isFalse()
+        assertThat(FreshnessPolicy.shouldRefreshListOnReconnect(fresh.copy(lastError = RefreshError.Malformed), now)).isFalse()
+        assertThat(FreshnessPolicy.shouldRefreshListOnReconnect(SyncInfo(lastSuccessAtMillis = now - 6 * 60_000), now)).isTrue()
+        assertThat(FreshnessPolicy.shouldRefreshListOnReconnect(SyncInfo(lastError = RefreshError.Http(503)), now)).isTrue()
+    }
 }

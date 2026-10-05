@@ -205,6 +205,24 @@ class MainFlowTest {
     }
 
     @Test
+    fun detailLoadsByItselfWhenTheConnectionComesBack() {
+        TestServer.always("Park", TestServer.json(Fixtures.parkList))
+        TestServer.always("ParkDetay", TestServer.json(Fixtures.parkDetail))
+        launch()
+        waitForList()
+
+        FakeConnectivity.offline = true
+        scrollToRow(101)
+        composeRule.onNodeWithTag(MainTestTags.parkRow(101)).performClick()
+        composeRule.waitForText("Showing list data only", substring = true)
+
+        // No tap on "Try again": the screen retries when the connection is back.
+        FakeConnectivity.offline = false
+
+        composeRule.waitForText("Rıhtım Cad. No:1 Kadıköy/İstanbul")
+    }
+
+    @Test
     fun noFavoritesYet_hasItsOwnEmptyScreen() {
         TestServer.always("Park", TestServer.json(Fixtures.parkList))
         launch()

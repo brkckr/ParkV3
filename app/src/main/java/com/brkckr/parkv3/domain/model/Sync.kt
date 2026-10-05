@@ -47,4 +47,13 @@ object FreshnessPolicy {
     fun isListStale(info: SyncInfo, nowMillis: Long): Boolean =
         info.lastError != null ||
             isOlderThan(info.lastSuccessAtMillis, nowMillis, LIST_STALE_WARNING_AFTER_MS)
+
+    /**
+     * When the connection comes back: retry a refresh that failed for lack of network, or one
+     * that is due anyway. Server-side failures (HTTP, malformed) are not retried just because
+     * the device reconnected.
+     */
+    fun shouldRefreshListOnReconnect(info: SyncInfo, nowMillis: Long): Boolean =
+        info.lastError == RefreshError.Network ||
+            isOlderThan(info.lastSuccessAtMillis, nowMillis, LIST_AUTO_REFRESH_AFTER_MS)
 }

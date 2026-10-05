@@ -5,7 +5,7 @@
 | Tür | Konum | Ne test ediyor | Komut |
 |---|---|---|---|
 | JVM unit | `app/src/test` | Ayrıştırıcı, senkron politikası, filtre/sıralama/Türkçe arama, alan kuralları, uzak kaynak (MockWebServer + gerçek Retrofit/OkHttp), ViewModel'ler (fake repository) | `./gradlew testDebugUnitTest` |
-| Robolectric | `app/src/test` | Repository + in-memory Room, yol tarifi intent zinciri, Hilt ile uçtan uca Compose akışları, erişilebilirlik ve yerelleştirme | aynı komut |
+| Robolectric | `app/src/test` | Repository + in-memory Room, yol tarifi intent zinciri, `ConnectivityManager` ile bağlantı izleyicisi, Hilt ile uçtan uca Compose akışları, erişilebilirlik ve yerelleştirme | aynı komut |
 | Cihaz | `app/src/androidTest` | Room şeması ve mevcut veritabanında favorilerin korunması, cihazda ana akış | `./gradlew connectedDebugAndroidTest` |
 | Lint | — | Android lint (hata olursa derleme kırılır) | `./gradlew lintDebug` |
 
@@ -24,7 +24,9 @@ testleri bunları birlikte kullanıyor. Hiçbir test canlı API'ye gitmiyor. Can
 Testler debug APK'sını kullanıyor. Sahte sunucu `localhost` üzerinde HTTP ile çalışıyor ve
 test thread'inde başlatılıyor (`TestServer.reset()`, `@Before` içinde). Çevrimdışı durum
 gerçek bir bağlantı kesilmesiyle değil, Hilt ile eklenen ve `IOException` fırlatan bir
-OkHttp interceptor'ıyla (`FakeConnectivity.offline`) simüle ediliyor.
+OkHttp interceptor'ıyla (`FakeConnectivity.offline`) simüle ediliyor. Aynı anahtar
+uygulamanın `NetworkMonitor`'üne de yansıyor, böylece bağlantının geri gelmesi de test
+edilebiliyor.
 Cleartext izni yalnızca debug derlemesinde ve yalnızca `localhost` / `127.0.0.1` için
 açık (`app/src/debug/res/xml/network_security_config.xml`). Testler Hilt test runner'ı
 (`com.brkckr.parkv3.HiltTestRunner`) ile çalışıyor.
@@ -49,7 +51,10 @@ CI'da aynı testler `Instrumented tests` iş akışında, API 34 x86_64 emülat�
 Ek olarak: boş/bozuk yanıt önbelleği silmez, küçülme koruması, eşzamanlı yenilemelerin tek
 isteğe birleşmesi, iptalin hata olarak kaydedilmemesi, bilinmeyen id için gelen sahte
 kaydın saklanmaması, yaklaşık konum, konum zaman aşımı, kalıcı izin reddi, kapalı konum
-servisi, Türkçe arayüz, 2x yazı ölçeğinde dokunma hedefleri.
+servisi, Türkçe arayüz, 2x yazı ölçeğinde dokunma hedefleri, bağlantı geri gelince
+yeniden deneme (`ReconnectionsTest`, `ListRefreshTriggersTest`,
+`ConnectivityNetworkMonitorTest`, `DetailViewModelTest`,
+`MainFlowTest.detailLoadsByItselfWhenTheConnectionComesBack`).
 
 ## İlkeler
 

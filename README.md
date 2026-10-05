@@ -12,7 +12,8 @@ uygulaması (Kotlin, Jetpack Compose).
 - Yerel favoriler. Ağ verisinden bağımsız saklanıyor, çevrimdışı da görünüyor
 - Harici harita uygulamasında yol tarifi (Google Maps → diğer harita uygulamaları → tarayıcı)
 - Verinin tazeliği: son başarılı indirme ve kaynağın güncelleme zamanı ayrı gösteriliyor.
-  Elle yenileme ve ön plana gelişte eskime kontrolü var
+  Elle yenileme, ön plana gelişte eskime kontrolü ve bağlantı geri gelince otomatik
+  yeniden deneme var
 - Çevrimdışı: önceden indirilen liste ve detaylar
 - Türkçe ve İngilizce arayüz, açık/koyu tema, erişilebilir etiketler, büyük yazı desteği
 
