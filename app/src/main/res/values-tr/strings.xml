@@ -123,6 +123,9 @@
     <string name="directions_unavailable_location">Kaynakta geçerli konum olmadığı için yol tarifi açılamıyor.</string>
     <string name="directions_no_app">Yol tarifini açabilecek bir uygulama bulunamadı.</string>
     <string name="action_show_on_map">Haritada göster</string>
+    <string name="action_share">Paylaş</string>
+    <string name="share_chooser_title">Otoparkı paylaş</string>
+    <string name="share_no_app">Paylaşmak için uygulama bulunamadı.</string>
 
     <!-- Harita -->
     <string name="map_unavailable_title">Harita kullanılamıyor</string>

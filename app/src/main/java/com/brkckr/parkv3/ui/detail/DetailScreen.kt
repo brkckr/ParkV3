@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Button
@@ -56,6 +57,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.brkckr.parkv3.R
 import com.brkckr.parkv3.domain.model.Occupancy
 import com.brkckr.parkv3.navigation.openDirections
+import com.brkckr.parkv3.navigation.sharePark
 import com.brkckr.parkv3.ui.components.StatusBadge
 import com.brkckr.parkv3.ui.components.amountText
 import com.brkckr.parkv3.ui.components.occupancyText
@@ -100,6 +102,16 @@ fun DetailRoute(
         } else {
             null
         },
+        // Only a park with a valid location can be shared as a map link.
+        onShare = state.location?.let { location ->
+            {
+                val name = state.name ?: resources.getString(R.string.park_unnamed, state.parkId)
+                val address = state.detail?.address ?: state.district
+                if (!context.sharePark(name, address, location, resources.getString(R.string.share_chooser_title))) {
+                    scope.launch { snackbarHostState.showSnackbar(resources.getString(R.string.share_no_app)) }
+                }
+            }
+        },
     )
 }
 
@@ -112,6 +124,7 @@ fun DetailScreen(
     onDirections: () -> Unit,
     onShowOnMap: (() -> Unit)?,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    onShare: (() -> Unit)? = null,
 ) {
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -130,6 +143,11 @@ fun DetailScreen(
                     }
                 },
                 actions = {
+                    if (onShare != null) {
+                        IconButton(onClick = onShare) {
+                            Icon(Icons.Filled.Share, contentDescription = stringResource(R.string.action_share))
+                        }
+                    }
                     IconButton(onClick = onRetry, enabled = !state.isRefreshing) {
                         Icon(Icons.Filled.Refresh, contentDescription = stringResource(R.string.action_refresh))
                     }

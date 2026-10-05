@@ -13,6 +13,7 @@ uygulaması (Kotlin, Jetpack Compose).
 - Detay: adres, çalışma saatleri, kapasite, kaynakta yayımlanan tarife, aylık abonelik
 - Yerel favoriler. Ağ verisinden bağımsız saklanıyor, çevrimdışı da görünüyor
 - Harici harita uygulamasında yol tarifi (Google Maps → diğer harita uygulamaları → tarayıcı)
+- Otoparkı paylaşma: ad, adres ve harita bağlantısı (anahtarsız Google Maps web bağlantısı)
 - Verinin tazeliği: son başarılı indirme ve kaynağın güncelleme zamanı ayrı gösteriliyor.
   Elle yenileme, ön plana gelişte eskime kontrolü ve bağlantı geri gelince otomatik
   yeniden deneme var

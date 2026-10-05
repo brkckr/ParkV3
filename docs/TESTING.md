@@ -60,7 +60,8 @@ yeniden deneme (`ReconnectionsTest`, `ListRefreshTriggersTest`,
 yer değiştirmeme ve otoparkın konumuna yakınlık (`AreaPolygonParserTest`), seçili alanın
 haritaya gelmesi ve haritada seçimde eksik detayın bir kez indirilmesi (`MainViewModelTest`),
 telefon ve tablet düzenleri (`ResultLayoutTest`, `AdaptiveLayoutTest`: Robolectric Google
-haritası çizemediği için harita yuvasına yer tutucu konuyor).
+haritası çizemediği için harita yuvasına yer tutucu konuyor), paylaşım metni ve sistem
+paylaşım menüsü (`ShareTest`, Türkçe yerelde ondalık nokta dahil).
 
 ## İlkeler
 
