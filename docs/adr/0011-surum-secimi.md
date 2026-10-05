@@ -12,6 +12,7 @@ Central metadata.
 | KSP | 2.3.12 | Maven Central |
 | Compose BOM | 2026.09.00 | developer.android.com BOM eşlemesi |
 | Activity | 1.13.0 | AndroidX |
+| AppCompat | 1.7.1 | AndroidX. Uygulama içi dil için ([ADR-0013](0013-uygulama-ici-dil.md)). Bu ortamdan Google Maven'a erişilemediği için varlığı bilinen sürüm seçildi. Çözümlenip çözümlenmediği CI derlemesinde görülüyor |
 | Lifecycle | 2.11.0 | AndroidX |
 | Navigation | 2.10.2 | AndroidX |
 | Room | 2.8.5 | AndroidX |

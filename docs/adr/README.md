@@ -14,3 +14,4 @@
 | [0010](0010-test-ve-ci.md) | Test stratejisi ve CI | Kabul |
 | [0011](0011-surum-secimi.md) | Kütüphane sürümlerinin seçimi | Kabul |
 | [0012](0012-alan-poligonlari.md) | Alan poligonları: WKT sırası, doğrulama ve çizim | Kabul |
+| [0013](0013-uygulama-ici-dil.md) | Uygulama içi dil seçimi (AppCompat uygulama başına dil) | Kabul |

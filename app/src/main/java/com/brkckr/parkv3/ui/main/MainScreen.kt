@@ -62,6 +62,8 @@ import com.brkckr.parkv3.navigation.RESULT_SHOW_ON_MAP
 import com.brkckr.parkv3.navigation.openDirections
 import com.brkckr.parkv3.navigation.tryStartActivity
 import com.brkckr.parkv3.ui.components.refreshErrorMessage
+import com.brkckr.parkv3.ui.language.AppLanguage
+import com.brkckr.parkv3.ui.language.LanguageMenu
 import com.brkckr.parkv3.ui.map.MapStatus
 import com.brkckr.parkv3.ui.map.ParkMapPane
 import kotlinx.coroutines.launch
@@ -89,6 +91,7 @@ class MainActions(
     val onDismissLocationMessage: () -> Unit = {},
     val onOpenAppSettings: () -> Unit = {},
     val onOpenLocationSettings: () -> Unit = {},
+    val onChangeLanguage: (AppLanguage) -> Unit = {},
 )
 
 @Composable
@@ -192,10 +195,13 @@ fun MainRoute(
                 )
             },
             onOpenLocationSettings = { context.tryStartActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)) },
+            onChangeLanguage = { AppLanguage.select(it) },
         )
     }
+    // Read once per composition: changing the language recreates the activity.
+    val language = remember { AppLanguage.current() }
 
-    MainScreen(state = state, actions = actions, snackbarHostState = snackbarHostState)
+    MainScreen(state = state, actions = actions, snackbarHostState = snackbarHostState, language = language)
 }
 
 @Composable
@@ -203,6 +209,7 @@ fun MainScreen(
     state: MainUiState,
     actions: MainActions,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    language: AppLanguage = AppLanguage.SYSTEM,
     mapPane: @Composable (Modifier) -> Unit = { modifier ->
         ParkMapPane(
             state = state,
@@ -241,6 +248,7 @@ fun MainScreen(
                             IconButton(onClick = actions.onRefresh, enabled = !state.isRefreshing) {
                                 Icon(Icons.Filled.Refresh, contentDescription = stringResource(R.string.action_refresh))
                             }
+                            LanguageMenu(current = language, onSelect = actions.onChangeLanguage)
                         }
                         FilterRow(
                             filters = state.filters,

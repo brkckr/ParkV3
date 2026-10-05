@@ -18,7 +18,8 @@ uygulaması (Kotlin, Jetpack Compose).
   Elle yenileme, ön plana gelişte eskime kontrolü ve bağlantı geri gelince otomatik
   yeniden deneme var
 - Çevrimdışı: önceden indirilen liste ve detaylar
-- Türkçe ve İngilizce arayüz, açık/koyu tema, erişilebilir etiketler, büyük yazı desteği
+- Türkçe ve İngilizce arayüz, uygulama içinden dil seçimi (Sistem dili / Türkçe / English),
+  açık/koyu tema, erişilebilir etiketler, büyük yazı desteği
 
 Veri: [İBB Açık Veri Portalı](https://data.ibb.gov.tr/) (CC BY 4.0), `https://api.ibb.gov.tr/ispark/`.
 Uygulama veriyi olduğu gibi gösteriyor ve eksik, tutarsız veya doğrulanmamış değerleri
