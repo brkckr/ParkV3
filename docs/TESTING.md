@@ -8,11 +8,13 @@
 | Robolectric | `app/src/test` | Repository + in-memory Room, yol tarifi intent zinciri, `ConnectivityManager` ile bağlantı izleyicisi, Hilt ile uçtan uca Compose akışları, erişilebilirlik ve yerelleştirme | aynı komut |
 | Cihaz | `app/src/androidTest` | Room şeması ve mevcut veritabanında favorilerin korunması, cihazda ana akış | `./gradlew connectedDebugAndroidTest` |
 | Lint | — | Android lint (hata olursa derleme kırılır) | `./gradlew lintDebug` |
+| Python | `scripts/test_api_contract.py` | API sözleşme kontrolü (ağsız, sentetik yanıtlarla) | `python3 -m unittest discover -s scripts` |
 
 Ortak test altyapısı `app/src/sharedTest` altında: sahte İSPARK sunucusu (`TestServer`),
 Hilt test modülleri, `FakeLocationProvider` ve **sentetik** fixture'lar. JVM ve cihaz
 testleri bunları birlikte kullanıyor. Hiçbir test canlı API'ye gitmiyor. Canlı sözleşme ayrı
-`api-probe` iş akışıyla ölçülüyor ([API_CONTRACT.md](API_CONTRACT.md)).
+`api-probe` iş akışıyla ölçülüp sözleşmeyle karşılaştırılıyor
+([API_CONTRACT.md](API_CONTRACT.md#sözleşme-kontrolü)).
 
 ### Cihaz testlerini çalıştırma
 

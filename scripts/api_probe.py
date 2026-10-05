@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-"""Probe the live İSPARK endpoints and summarise their contract.
+"""Probe the live İSPARK endpoints, summarise them and check the contract (api_contract.py).
 
 Writes raw responses and a Markdown report to --out, prints the report, and appends it to
-$GITHUB_STEP_SUMMARY when available. Exits non-zero only if the list endpoint is unusable.
-Standard library only.
+$GITHUB_STEP_SUMMARY when available. Exit codes: 0 = contract holds, 1 = the source could
+not be reached (network error or HTTP 5xx; nothing is concluded), 2 = contract violated
+(issue.md is written for the workflow to file). Standard library only.
 """
 import argparse
 import collections
+import datetime
 import json
 import os
 import sys
@@ -14,9 +16,15 @@ import time
 import urllib.error
 import urllib.request
 
-BASE = "https://api.ibb.gov.tr/ispark/"
-LAT_RANGE = (40.5, 41.9)
-LNG_RANGE = (27.5, 30.0)
+import api_contract
+from api_contract import as_number, json_type as jtype
+
+BASE = os.environ.get("ISPARK_PROBE_BASE", "https://api.ibb.gov.tr/ispark/")  # override for local runs
+LAT_RANGE = api_contract.ISTANBUL_LAT
+LNG_RANGE = api_contract.ISTANBUL_LNG
+UNKNOWN_ID = 999999999
+EXIT_OUTAGE = 1
+EXIT_VIOLATION = 2
 
 
 def fetch(url):
@@ -30,33 +38,6 @@ def fetch(url):
         return e.code, dict(e.headers or {}), e.read() if e.fp else b"", time.monotonic() - started, None
     except Exception as e:  # network failure: report, do not crash
         return None, {}, b"", time.monotonic() - started, repr(e)
-
-
-def jtype(v):
-    if v is None:
-        return "null"
-    if isinstance(v, bool):
-        return "bool"
-    if isinstance(v, int):
-        return "int"
-    if isinstance(v, float):
-        return "float"
-    if isinstance(v, str):
-        return "str"
-    return type(v).__name__
-
-
-def as_number(v):
-    if isinstance(v, bool) or v is None:
-        return None
-    if isinstance(v, (int, float)):
-        return float(v)
-    if isinstance(v, str):
-        try:
-            return float(v.strip().replace(",", ".")) if v.strip() else None
-        except ValueError:
-            return None
-    return None
 
 
 def field_table(records):
@@ -124,20 +105,16 @@ def analyse_list(records):
     return out
 
 
-def pick_detail_ids(records):
-    chosen = []
+def decode(body):
+    """Decoded JSON, or None when the body is empty or not JSON."""
+    try:
+        return json.loads(body.decode("utf-8-sig")) if body else None
+    except (ValueError, UnicodeDecodeError):
+        return None
 
-    def add(pred):
-        for r in records:
-            if pred(r) and r.get("parkID") not in chosen:
-                chosen.append(r.get("parkID"))
-                return
 
-    add(lambda r: True)
-    add(lambda r: str(r.get("isOpen")) in ("0", "False", "false"))
-    add(lambda r: r.get("isOpen") is None)
-    add(lambda r: (as_number(r.get("emptyCapacity")) or 0) > (as_number(r.get("capacity")) or 1e9))
-    return [i for i in chosen if i is not None][:4]
+def unreachable(status):
+    return status is None or status >= 500
 
 
 def main():
@@ -146,58 +123,78 @@ def main():
     args = ap.parse_args()
     os.makedirs(args.out, exist_ok=True)
     report = [f"# İSPARK API probe ({time.strftime('%Y-%m-%d %H:%M:%S %Z')})", ""]
-    exit_code = 0
 
     status, headers, body, elapsed, err = fetch(BASE + "Park")
     with open(os.path.join(args.out, "park.json"), "wb") as f:
         f.write(body)
     report.append(f"## GET Park\n\nstatus={status} content-type={headers.get('Content-Type')} "
                   f"bytes={len(body)} elapsed={elapsed:.2f}s error={err}\n")
+    list_status = status
+    data = decode(body)
     records = []
-    try:
-        data = json.loads(body.decode("utf-8-sig")) if body else None
+    if data is None and body:
+        report.append(f"JSON decode failed; body head: {body[:300]!r}\n")
+    else:
         report.append(f"top-level type: `{jtype(data)}`\n")
-        if isinstance(data, list):
-            records = [r for r in data if isinstance(r, dict)]
-            report.append(f"records: {len(data)} (objects: {len(records)})\n")
+    if isinstance(data, list):
+        records = [r for r in data if isinstance(r, dict)]
+        report.append(f"records: {len(data)} (objects: {len(records)})\n")
+        if records:
             report += field_table(records) + [""]
             report += [f"- {line}" for line in analyse_list(records)] + [""]
             report.append("First two records:\n\n```json\n" +
                           json.dumps(data[:2], ensure_ascii=False, indent=2) + "\n```\n")
-        else:
-            exit_code = 1
-    except (ValueError, UnicodeDecodeError) as e:
-        report.append(f"JSON decode failed: {e!r}; body head: {body[:300]!r}\n")
-        exit_code = 1
-    if status != 200 or not records:
-        exit_code = 1
+    list_response = (status, data)
 
-    for pid in pick_detail_ids(records):
+    # A sample spread over park types, rotating weekly (wider coverage of areaPolygon etc.).
+    year, week, _ = datetime.date.today().isocalendar()
+    detail_responses = {}
+    detail_records = []
+    report.append("## GET ParkDetay (sample)\n")
+    for pid in api_contract.pick_detail_ids(records, seed=year * 100 + week):
         status, headers, body, elapsed, err = fetch(f"{BASE}ParkDetay?id={pid}")
         with open(os.path.join(args.out, f"detail-{pid}.json"), "wb") as f:
             f.write(body)
-        report.append(f"## GET ParkDetay?id={pid}\n\nstatus={status} content-type={headers.get('Content-Type')} "
-                      f"bytes={len(body)} elapsed={elapsed:.2f}s error={err}\n")
-        try:
-            d = json.loads(body.decode("utf-8-sig")) if body else None
-        except (ValueError, UnicodeDecodeError) as e:
-            report.append(f"JSON decode failed: {e!r}; body head: {body[:300]!r}\n")
-            continue
-        report.append(f"top-level type: `{jtype(d)}`, length: {len(d) if isinstance(d, list) else '-'}\n")
-        objs = d if isinstance(d, list) else [d] if isinstance(d, dict) else []
-        objs = [o for o in objs if isinstance(o, dict)]
-        if objs:
-            report += field_table(objs) + [""]
-            shown = dict(objs[0])
-            poly = shown.get("areaPolygon")
-            if isinstance(poly, str) and len(poly) > 160:
-                shown["areaPolygon"] = poly[:160] + f"… ({len(poly)} chars)"
-            report.append("```json\n" + json.dumps(shown, ensure_ascii=False, indent=2) + "\n```\n")
+        d = decode(body)
+        detail_responses[pid] = (status, d)
+        report.append(f"- id={pid}: status={status} bytes={len(body)} elapsed={elapsed:.2f}s "
+                      f"type={jtype(d)} error={err}")
+        if isinstance(d, list):
+            detail_records += [o for o in d if isinstance(o, dict)]
+        time.sleep(0.3)  # be gentle with the public API
+    report.append("")
+    if detail_records:
+        report += field_table(detail_records) + [""]
+        shown = dict(detail_records[0])
+        poly = shown.get("areaPolygon")
+        if isinstance(poly, str) and len(poly) > 160:
+            shown["areaPolygon"] = poly[:160] + f"… ({len(poly)} chars)"
+        report.append("First detail record:\n\n```json\n" +
+                      json.dumps(shown, ensure_ascii=False, indent=2) + "\n```\n")
 
-    # Unknown id behaviour.
-    status, _, body, _, err = fetch(BASE + "ParkDetay?id=999999999")
-    report.append(f"## GET ParkDetay?id=999999999 (unknown id)\n\nstatus={status} error={err} body head: "
+    status, _, body, _, err = fetch(f"{BASE}ParkDetay?id={UNKNOWN_ID}")
+    report.append(f"## GET ParkDetay?id={UNKNOWN_ID} (unknown id)\n\nstatus={status} error={err} body head: "
                   f"`{body[:200].decode('utf-8', 'replace')}`\n")
+    unknown_response = (UNKNOWN_ID, status, decode(body))
+
+    if unreachable(list_status):
+        report.append("## Contract check\n\nSkipped: the list endpoint could not be reached "
+                      "(network error or HTTP 5xx). Nothing is concluded from this run.\n")
+        exit_code = EXIT_OUTAGE
+    else:
+        # Detail requests that hit an outage say nothing about the contract either.
+        reachable = {pid: r for pid, r in detail_responses.items() if not unreachable(r[0])}
+        result = api_contract.check(list_response, reachable, unknown_response)
+        report += api_contract.report_lines(result)
+        exit_code = EXIT_VIOLATION if result.violations else 0
+        if result.violations:
+            run_url = "{}/{}/actions/runs/{}".format(
+                os.environ.get("GITHUB_SERVER_URL", "https://github.com"),
+                os.environ.get("GITHUB_REPOSITORY", "brkckr/ParkV3"),
+                os.environ.get("GITHUB_RUN_ID", "local"),
+            )
+            with open(os.path.join(args.out, "issue.md"), "w", encoding="utf-8") as f:
+                f.write(api_contract.issue_body(result, run_url))
 
     text = "\n".join(report)
     with open(os.path.join(args.out, "report.md"), "w", encoding="utf-8") as f:

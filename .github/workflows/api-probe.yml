@@ -1,26 +1,40 @@
 name: API contract probe
 
-# Measures the live behaviour of the İSPARK endpoints (docs/API_CONTRACT.md). It does not
-# gate the Android build: the source is an external service outside this repo's control.
+# Measures the live İSPARK endpoints and checks them against the contract the app relies on
+# (scripts/api_contract.py, docs/API_CONTRACT.md). It does not gate the Android build: the
+# source is an external service outside this repo's control. A scheduled or manual run that
+# finds a contract violation opens an issue, or comments on the one already open.
 on:
   workflow_dispatch:
   schedule:
     - cron: "17 6 * * 1"
   pull_request:
     paths:
-      - scripts/api_probe.py
+      - scripts/**
       - .github/workflows/api-probe.yml
 
 permissions:
   contents: read
 
 jobs:
+  contract-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - name: Contract check unit tests (offline)
+        run: python3 -m unittest discover -s scripts -v
+
   probe:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
     steps:
       - uses: actions/checkout@v5
       - name: Probe Park and ParkDetay
+        # Exit 1 = source unreachable (no conclusion), 2 = contract violated (issue.md written).
         run: python3 scripts/api_probe.py --out probe-output
       - name: Upload raw responses and report
         if: always()
@@ -29,3 +43,20 @@ jobs:
           name: api-probe
           path: probe-output/
           if-no-files-found: ignore
+      - name: Open or update the contract issue
+        if: failure() && github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          if [ ! -f probe-output/issue.md ]; then
+            echo "The source was unreachable; that is not a contract change, so no issue is filed."
+            exit 0
+          fi
+          gh label create api-contract --repo "$REPO" --color D93F0B --description "İSPARK API sözleşmesi" --force
+          number=$(gh issue list --repo "$REPO" --label api-contract --state open --json number --jq '.[0].number // empty')
+          if [ -n "$number" ]; then
+            gh issue comment "$number" --repo "$REPO" --body-file probe-output/issue.md
+          else
+            gh issue create --repo "$REPO" --title "İSPARK API sözleşmesi değişti" --label api-contract --body-file probe-output/issue.md
+          fi

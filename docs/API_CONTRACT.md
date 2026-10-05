@@ -5,7 +5,8 @@
 > `api.ibb.gov.tr` alan adına erişemediği için ölçüm CI üzerinden yapıldı.
 > Ölçüm tek bir ana ait. Alanlar zamanla değişebilir. Bu yüzden uygulama tüm alanları hâlâ
 > **isteğe bağlı ve tipi esnek** olarak ayrıştırıyor. `api-probe` her hafta ve elle
-> tetiklendiğinde yeniden çalışıyor.
+> tetiklendiğinde yeniden çalışıyor ve yanıtları aşağıdaki sözleşmeyle karşılaştırıyor
+> ([Sözleşme kontrolü](#sözleşme-kontrolü)).
 
 ## Uç noktalar
 
@@ -48,7 +49,7 @@ Kimlik doğrulama gerekmiyor (açık veri, CC BY 4.0). Hız sınırı belgelenme
 | `monthlyFee` | **float** | `3500.0`, `0.0` | `> 0` → "Aylık abonelik: 3.500,00". `0.0` ve eksik → "Belirtilmemiş". Bilinmeyen id yanıtı da `0.0` döndüğü için 0 "ücretsiz" olarak yorumlanmıyor |
 | `tariff` | string | `"0-1 Saat : 110,00;1-2 Saat : 140,00;…;Tam Gün : 370,00"` | `;` ile satırlara bölünür. Her satır ilk `:` işaretinden etiket ve değer olarak ayrılıp olduğu gibi gösterilir. Para birimi kaynakta yazmadığı için eklenmiyor |
 | `updateDate` | string **veya null** | `"05.10.2026 00:10:23"`, `null` | `dd.MM.yyyy HH:mm:ss`, Europe/Istanbul (ölçüm anı 21:12 UTC ile tutarlı). "Kaynak güncelleme zamanı" olarak ayrı gösterilir |
-| `areaPolygon` | string (WKT) | `"POLYGON ((29.0910 41.0251, 29.0920 41.0251, …))"` | Ölçülen örnekler WKT standardındaki X=boylam, Y=enlem sırasındaydı. v1'de çizilmiyor, ham saklanıyor (backlog) |
+| `areaPolygon` | string (WKT) | `"POLYGON ((29.0910 41.0251, 29.0920 41.0251, …))"` | Ölçülen örnekler WKT standardındaki X=boylam, Y=enlem sırasındaydı. Probe bunu her hafta değişen 20 kayıtlık bir örneklemde, poligonun kaydın kendi konumuna hangi sırada denk geldiğine bakarak kontrol ediyor. v1'de çizilmiyor, ham saklanıyor (backlog) |
 
 Detayda **`isOpen`, `fee` ve `phone` yok.** Detay ekranı açık/kapalı bilgisini listedeki kayıttan alıyor
 ve kendi zaman damgasıyla gösteriyor.
@@ -75,8 +76,42 @@ ve kendi zaman damgasıyla gösteriyor.
 - **Kaynak güncelleme zamanı (`updateDate`)**: Yalnızca detayda ve bazen null. Cihaz
   saatiyle karıştırılmaz.
 
+## Sözleşme kontrolü
+
+`scripts/api_contract.py` yukarıdaki ölçümü kod olarak tutuyor. `api-probe` her çalışmada
+listeyi, park türlerine yayılan ve her hafta değişen 20 detayı ve bilinmeyen id yanıtını
+bununla karşılaştırıyor.
+
+**Sapma (iş akışı kırmızı, zamanlanmış veya elle çalışmada issue):**
+- `Park` HTTP 200 dışında bir kod (5xx hariç), dizi olmayan gövde ya da 123'ten az kayıt
+  (ölçülen 246'nın yarısı, uygulamanın küçülme korumasıyla aynı mantık).
+- Kayıtların %5'inden fazlasında: bir alan eksik, tipi ölçülenden farklı, yeni bir alan var,
+  kullanılabilir `parkID` yok, koordinat İstanbul kutusu dışında, `isOpen` 0/1 dışında.
+- Detay: tek elemanlı dizi değil, istenen id'den farklı `parkID` (uygulama bunu "bulunamadı"
+  sayar), uygulamanın okuyamadığı `updateDate`, enlem-boylam sırasında bir `areaPolygon`,
+  WKT olmayan poligonlar.
+- Bilinmeyen id için o id'ye ait bir kayıt dönmesi.
+
+**Not (yalnızca raporda):** %5'in altındaki sapmalar, uygulamanın hâlâ okuyabildiği yeni bir
+tarih biçimi, `etiket : değer` biçiminde olmayan tarife satırları, kaydın konumundan uzak
+poligonlar, bilinmeyen id davranışının değişmesi (ör. 404).
+
+**Kesinti sözleşme değişikliği sayılmıyor:** Ağ hatası veya HTTP 5xx'te kontrol atlanıyor,
+iş akışı kırmızı oluyor ama issue açılmıyor. Çıkış kodları: 0 sözleşme geçerli, 1 kaynağa
+ulaşılamadı, 2 sapma.
+
+**Issue:** `api-contract` etiketli açık bir issue varsa yeni çalışma ona yorum ekliyor, yoksa
+"İSPARK API sözleşmesi değişti" başlıklı yeni bir issue açılıyor. PR'lardaki çalışmalar issue
+açmıyor.
+
+**Sözleşme değişince:** Değişiklik kalıcıysa `scripts/api_contract.py` içindeki beklentiyi,
+bu belgeyi ve gerekirse `ParkJsonParser`'ı aynı PR'da güncelleyin.
+
 ## Probe nasıl çalıştırılır
 
 GitHub → Actions → "API contract probe" → Run workflow. Yerelde
 `python3 scripts/api_probe.py --out probe-output` (ağ erişimi gerekir). Ham yanıtlar ve
-Markdown rapor `probe-output/` klasörüne ve iş akışı artefaktına yazılır.
+Markdown rapor `probe-output/` klasörüne ve iş akışı artefaktına yazılır. Sahte bir sunucuya
+karşı denemek için `ISPARK_PROBE_BASE=http://127.0.0.1:8765/ispark/`.
+
+Kontrolün kendi testleri ağ gerektirmiyor: `python3 -m unittest discover -s scripts`.
