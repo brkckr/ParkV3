@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -70,11 +71,17 @@ private val ISTANBUL = LatLng(41.0082, 28.9784)
 
 private fun GeoPoint.toLatLng() = LatLng(latitude, longitude)
 
-/** Map adapter for a list item; [selected] is part of equality so the pin re-renders. */
-private data class ParkClusterItem(val item: ParkListItem, val selected: Boolean) : ClusterItem {
+/**
+ * Map adapter for a list item; [selected] is part of equality so the pin re-renders. Title and
+ * snippet are what TalkBack announces for the pin (see [markerText]).
+ */
+private data class ParkClusterItem(
+    val item: ParkListItem,
+    val selected: Boolean,
+    override val title: String,
+    override val snippet: String,
+) : ClusterItem {
     override val position: LatLng = item.park.location!!.toLatLng()
-    override val title: String? get() = item.park.name
-    override val snippet: String? get() = item.park.district
     override val zIndex: Float get() = if (selected) 1f else 0f
 }
 
@@ -115,8 +122,12 @@ private fun GoogleParkMap(
         position = CameraPosition.fromLatLngZoom(ISTANBUL, 10f)
     }
     // Invalid coordinates are never drawn (docs/adr/0003).
-    val clusterItems = remember(state.items, state.selectedParkId) {
-        state.items.filter { it.park.location != null }.map { ParkClusterItem(it, it.park.id == state.selectedParkId) }
+    val resources = LocalResources.current
+    val clusterItems = remember(state.items, state.selectedParkId, resources) {
+        state.items.filter { it.park.location != null }.map { item ->
+            val text = resources.markerText(item.park)
+            ParkClusterItem(item, item.park.id == state.selectedParkId, text.title, text.snippet)
+        }
     }
     val hiddenCount = state.items.size - clusterItems.size
     val selected = state.selectedItem

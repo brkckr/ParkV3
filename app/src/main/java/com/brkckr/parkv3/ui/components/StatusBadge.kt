@@ -1,5 +1,6 @@
 package com.brkckr.parkv3.ui.components
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -27,21 +28,26 @@ import com.brkckr.parkv3.ui.theme.LocalStatusColors
 
 data class StatusStyle(val icon: ImageVector, val container: Color, val content: Color, val label: String)
 
+/** Label of an availability, shared by status badges and map pin descriptions. */
+@StringRes
+fun availabilityLabel(availability: Availability): Int = when (availability) {
+    Availability.AVAILABLE -> R.string.status_available
+    Availability.FULL -> R.string.status_full
+    Availability.CLOSED -> R.string.status_closed
+    Availability.OPEN_OCCUPANCY_UNKNOWN -> R.string.status_open_unknown_occupancy
+    Availability.UNKNOWN -> R.string.status_unknown
+}
+
 @Composable
 fun statusStyle(availability: Availability): StatusStyle {
     val colors = LocalStatusColors.current
+    val label = stringResource(availabilityLabel(availability))
     return when (availability) {
-        Availability.AVAILABLE -> StatusStyle(
-            Icons.Filled.CheckCircle, colors.availableContainer, colors.onAvailable, stringResource(R.string.status_available),
-        )
-        Availability.FULL -> StatusStyle(Icons.Filled.Block, colors.fullContainer, colors.onFull, stringResource(R.string.status_full))
-        Availability.CLOSED -> StatusStyle(Icons.Filled.Lock, colors.closedContainer, colors.onClosed, stringResource(R.string.status_closed))
-        Availability.OPEN_OCCUPANCY_UNKNOWN -> StatusStyle(
-            Icons.Filled.Info, colors.unknownContainer, colors.onUnknown, stringResource(R.string.status_open_unknown_occupancy),
-        )
-        Availability.UNKNOWN -> StatusStyle(
-            Icons.Filled.QuestionMark, colors.unknownContainer, colors.onUnknown, stringResource(R.string.status_unknown),
-        )
+        Availability.AVAILABLE -> StatusStyle(Icons.Filled.CheckCircle, colors.availableContainer, colors.onAvailable, label)
+        Availability.FULL -> StatusStyle(Icons.Filled.Block, colors.fullContainer, colors.onFull, label)
+        Availability.CLOSED -> StatusStyle(Icons.Filled.Lock, colors.closedContainer, colors.onClosed, label)
+        Availability.OPEN_OCCUPANCY_UNKNOWN -> StatusStyle(Icons.Filled.Info, colors.unknownContainer, colors.onUnknown, label)
+        Availability.UNKNOWN -> StatusStyle(Icons.Filled.QuestionMark, colors.unknownContainer, colors.onUnknown, label)
     }
 }
 
