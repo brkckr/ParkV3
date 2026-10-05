@@ -7,8 +7,8 @@ Central metadata.
 | Bileşen | Sürüm | Kaynak / not |
 |---|---|---|
 | AGP | 9.4.0 | developer.android.com. Gradle ≥ 9.6.0, JDK 17+, build-tools 36.0.0 gerektiriyor |
-| Gradle | 9.6.0 | services.gradle.org |
-| Kotlin (KGP) | 2.4.10 | Maven Central. `maps-compose` 8.6.0, stdlib 2.4.10 istiyor. AGP built-in Kotlin, buildscript classpath ile yükseltildi |
+| Gradle | 9.6.0 | services.gradle.org. 9.8.0 çıktı (2026-09-24), ancak sağlama toplamı (`downloads.gradle.org`) bu ortamdan erişilemediği için doğrulanmış toplam olmadan wrapper güncellenmedi |
+| Kotlin (KGP) | 2.4.20 | Maven Central (2026-10-05 güncellemesi). `maps-compose` 9.0.0, stdlib 2.4.10 veya üstünü istiyor. AGP built-in Kotlin, buildscript classpath ile yükseltildi |
 | KSP | 2.3.12 | Maven Central |
 | Compose BOM | 2026.09.00 | developer.android.com BOM eşlemesi |
 | Activity | 1.13.0 | AndroidX |
@@ -23,8 +23,8 @@ Central metadata.
 | OkHttp | 5.5.0 | Maven Central |
 | kotlinx.serialization | 1.11.0 | Maven Central (1.12.0 henüz RC) |
 | Coroutines | 1.11.0 | Maven Central |
-| maps-compose (+utils) | 8.6.0 | Maven Central. 9.0.0 üç gün önce çıktığı ve büyük sürüm olduğu için bilinçli olarak bekletildi |
-| play-services-location | 21.3.0 | developers.google.com ve Google Maven bu ortamdan erişilemedi. Varlığı bilinen sürüm seçildi (21.4.0 çıktığı bildiriliyor, backlog) |
+| maps-compose (+utils) | 9.0.0 | Maven Central (2026-10-05 güncellemesi). 8.6.0 ile 9.0.0'ın kullandığımız açık API'leri (`GoogleMap`, `Clustering`, `Polygon`, `Marker`, `Circle`, kamera durumu, `ClusterItem`) bayt kodundan karşılaştırıldı, fark yok. 9.0.0 `maps-ktx` bağımlılığını bırakıyor, uygulama onu kullanmıyor. `android-maps-utils` 5.2.0'dan 6.0.0'a geçiyor |
+| play-services-location | 21.3.0 | developers.google.com ve Google Maven (aynası dahil) bu ortamdan erişilemedi. Varlığı bilinen sürüm seçildi. Daha yeni sürüm doğrulanmadan yazılmıyor (backlog) |
 | Robolectric | 4.17 | Maven Central |
 | androidx.test | core/runner/rules 1.7.0, ext.junit 1.3.0, espresso 3.7.0 | AndroidX |
 
