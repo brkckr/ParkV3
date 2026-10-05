@@ -17,7 +17,7 @@ konular:
 | Eksik alanlar | DTO varsayılanları `0` / `""`. Eksik değer ile 0 ayırt edilemiyor | Alanlar nullable. Eksik, geçersiz ve 0 ayrı modelleniyor ([ADR-0003](adr/0003-toleransli-ayristirma.md)) |
 | `isOpen` | `isOpen == 0` olduğunda önbellekteki değere düşüyor | `1/true` → açık, `0/false` → kapalı, diğer durumlar → **bilinmiyor** |
 | Ücret | `fee` "Saatlik ücret" olarak etiketleniyor | Anlamı doğrulanmadığı için yalnızca "Ücret (kaynak değeri)" deniyor |
-| Poligon | Enlem/boylam sırası sayısal büyüklüğe göre tahmin ediliyor | v1'de poligon çizilmiyor, ham metin saklanıyor ([ADR-0003](adr/0003-toleransli-ayristirma.md)) |
+| Poligon | Enlem/boylam sırası sayısal büyüklüğe göre tahmin ediliyor | Sıra tahmin edilmiyor: WKT standardındaki sırayla okunuyor, eksenler hiç değiştirilmiyor ve alan yalnızca otoparkın kendi konumunun çevresindeyse çiziliyor ([ADR-0012](adr/0012-alan-poligonlari.md)) |
 | Favoriler | Park tablosunda kolon olarak tutuluyor | Ayrı `favorites` tablosu; yenileme bu tabloya hiç dokunmuyor |
 | Filtre | Tek filtre seçilebiliyor | Açık + boş yer + favori filtreleri birlikte kullanılabiliyor |
 | Ağ logu | `BODY` seviyesi her derlemede açık | Gövde logu yalnızca debug derlemede açık |
@@ -37,6 +37,9 @@ konular:
 ## Aşamalar
 
 Her aşama kendi içinde derlenebilir ve çalışan bir akış teslim eder.
+
+**Durum (2026-10-05):** 0–5 arası tüm aşamalar tamamlandı ve `main`'e birleşti. Sonraki işler
+[BACKLOG.md](BACKLOG.md)'den yürütülüyor (tamamlananlar orada listeli).
 
 | # | Aşama | Çalışan akış | Doğrulama |
 |---|---|---|---|
