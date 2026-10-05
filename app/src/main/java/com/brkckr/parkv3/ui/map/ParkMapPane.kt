@@ -70,11 +70,10 @@ private fun GeoPoint.toLatLng() = LatLng(latitude, longitude)
 
 /** Map adapter for a list item; [selected] is part of equality so the pin re-renders. */
 private data class ParkClusterItem(val item: ParkListItem, val selected: Boolean) : ClusterItem {
-    private val latLng = item.park.location!!.toLatLng()
-    override fun getPosition(): LatLng = latLng
-    override fun getTitle(): String? = item.park.name
-    override fun getSnippet(): String? = item.park.district
-    override fun getZIndex(): Float = if (selected) 1f else 0f
+    override val position: LatLng = item.park.location!!.toLatLng()
+    override val title: String? get() = item.park.name
+    override val snippet: String? get() = item.park.district
+    override val zIndex: Float get() = if (selected) 1f else 0f
 }
 
 @Composable

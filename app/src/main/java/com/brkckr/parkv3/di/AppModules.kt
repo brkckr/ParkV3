@@ -85,18 +85,24 @@ object DatabaseModule {
 
 @Module
 @InstallIn(SingletonComponent::class)
-interface BindingsModule {
+interface RepositoryModule {
 
     @Binds
     fun bindParkRepository(impl: OfflineFirstParkRepository): ParkRepository
+
+    /** Debug builds contribute a logger (src/debug); release builds contribute nothing. */
+    @Multibinds
+    fun networkInterceptors(): Set<Interceptor>
+}
+
+/** Device integrations; tests replace this module with fakes. */
+@Module
+@InstallIn(SingletonComponent::class)
+interface PlatformModule {
 
     @Binds
     fun bindLocationProvider(impl: FusedLocationProvider): LocationProvider
 
     @Binds
     fun bindMapAvailability(impl: PlayServicesMapAvailability): MapAvailability
-
-    /** Debug builds contribute a logger (src/debug); release builds contribute nothing. */
-    @Multibinds
-    fun networkInterceptors(): Set<Interceptor>
 }

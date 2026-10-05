@@ -17,6 +17,7 @@ import com.brkckr.parkv3.domain.model.RefreshResult
 import com.brkckr.parkv3.ui.map.MapAvailability
 import com.brkckr.parkv3.ui.map.MapStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -117,11 +118,12 @@ class DetailViewModel @Inject constructor(
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), DetailUiState(parkId))
 
-    init {
-        refreshIfStale()
-    }
+    private var refreshJob: Job? = null
 
-    /** Called when the screen returns to the foreground. */
+    /**
+     * Called each time the screen starts (first open and every return to the foreground);
+     * the single trigger avoids racing duplicate requests on open.
+     */
     fun onForeground() = refreshIfStale()
 
     fun onRetry() = refresh()
@@ -132,7 +134,8 @@ class DetailViewModel @Inject constructor(
     }
 
     private fun refreshIfStale() {
-        viewModelScope.launch {
+        if (refreshJob?.isActive == true) return
+        refreshJob = viewModelScope.launch {
             val fetchedAt = repository.observeDetail(parkId).first()?.fetchedAtMillis
             if (FreshnessPolicy.isOlderThan(fetchedAt, clock.nowMillis(), FreshnessPolicy.DETAIL_REFRESH_AFTER_MS)) {
                 refreshNow()
@@ -141,7 +144,8 @@ class DetailViewModel @Inject constructor(
     }
 
     private fun refresh() {
-        viewModelScope.launch { refreshNow() }
+        if (refreshJob?.isActive == true) return
+        refreshJob = viewModelScope.launch { refreshNow() }
     }
 
     private suspend fun refreshNow() {

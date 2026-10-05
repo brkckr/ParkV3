@@ -74,9 +74,6 @@ android {
     lint {
         abortOnError = true
         checkDependencies = false
-        // Print every finding to the build log so CI output is reviewable without artifacts.
-        textReport = true
-        textOutput = file("stdout")
         // Version-bump suggestions are tracked deliberately in docs/adr/0011.
         disable += setOf("GradleDependency", "NewerVersionAvailable", "AndroidGradlePluginVersion")
     }
