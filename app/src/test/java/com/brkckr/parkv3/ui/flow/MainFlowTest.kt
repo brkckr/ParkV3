@@ -171,6 +171,8 @@ class MainFlowTest {
         composeRule.waitForText("Rıhtım Cad. No:1 Kadıköy/İstanbul")
         composeRule.waitForIdle() // let the navigation transition finish before touching shared labels
         composeRule.onNodeWithText("0-1 Saat").assertExists()
+        // The park has a valid location, so it can be shared as a map link.
+        composeRule.onNodeWithContentDescription("Share").assertIsDisplayed()
         composeRule.onNodeWithContentDescription("Add to favorites").performClick()
         // The write goes through Room on a background thread before the toggle flips.
         composeRule.waitShowingTree("favorite to be saved") {

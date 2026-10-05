@@ -15,14 +15,11 @@ import java.util.Locale
 object DirectionsIntents {
     const val GOOGLE_MAPS_PACKAGE = "com.google.android.apps.maps"
 
-    /** Decimal point regardless of the UI locale; a Turkish "41,0" would break the URI. */
-    private fun GeoPoint.coordinates() = String.format(Locale.US, "%.6f,%.6f", latitude, longitude)
-
     fun webUri(destination: GeoPoint): Uri =
-        "https://www.google.com/maps/dir/?api=1&destination=${destination.coordinates()}&travelmode=driving".toUri()
+        "https://www.google.com/maps/dir/?api=1&destination=${destination.uriCoordinates()}&travelmode=driving".toUri()
 
     fun candidates(destination: GeoPoint, label: String): List<Intent> {
-        val coordinates = destination.coordinates()
+        val coordinates = destination.uriCoordinates()
         return listOf(
             Intent(Intent.ACTION_VIEW, webUri(destination)).setPackage(GOOGLE_MAPS_PACKAGE),
             Intent(Intent.ACTION_VIEW, "geo:$coordinates?q=$coordinates(${Uri.encode(label)})".toUri()),
@@ -30,6 +27,9 @@ object DirectionsIntents {
         )
     }
 }
+
+/** "lat,lng" with a decimal point regardless of the UI locale; a Turkish "41,0" would break a URI. */
+internal fun GeoPoint.uriCoordinates(): String = String.format(Locale.US, "%.6f,%.6f", latitude, longitude)
 
 /** Returns false (and never crashes) when no app can show directions. */
 fun Context.openDirections(destination: GeoPoint, label: String): Boolean =

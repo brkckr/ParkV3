@@ -11,3 +11,12 @@ Yol tarifi intent'leri sırayla deneniyor. İlk başarılı olanda duruluyor:
 `ActivityNotFoundException` ve `SecurityException` yakalanıyor. Manifestte `<queries>`
 bildirimleri var. Seçim mantığı (`DirectionsIntentFactory`) saf ve test edilebilir.
 Koordinatı geçersiz parkta yol tarifi düğmesi devre dışı ve bunun nedeni yazıyor.
+
+## Paylaşım
+Detay ekranındaki "Paylaş" düğmesi sistem paylaşım menüsünü (`ACTION_SEND`, `text/plain`)
+açıyor. Metin otoparkın adı, adresi ve
+`https://www.google.com/maps/search/?api=1&query=lat,lng` bağlantısından oluşuyor. Bağlantı
+uygulama, hesap veya API anahtarı gerektirmiyor. Koordinatlar yol tarifindeki gibi her
+yerelde ondalık noktayla yazılıyor. Doluluk birkaç dakikada eskidiği için metne eklenmiyor.
+Geçerli konumu olmayan otoparkta düğme gösterilmiyor. Paylaşacak uygulama yoksa çökme yerine
+mesaj gösteriliyor.
