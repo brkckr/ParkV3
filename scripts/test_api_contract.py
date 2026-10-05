@@ -89,14 +89,22 @@ class ContractTest(unittest.TestCase):
         probe.list_status = 404
         self.assertIn("Park: HTTP 404", probe.run().violations)
 
-    def test_coordinates_outside_istanbul_and_odd_open_values(self):
+    def test_coordinates_outside_istanbul_are_a_violation(self):
         probe = Probe()
         for r in probe.list[:20]:
             r["lat"], r["lng"] = r["lng"], r["lat"]
-            r["isOpen"] = True
-        violations = " ".join(probe.run().violations)
-        self.assertIn("outside the Istanbul box", violations)
-        self.assertIn("isOpen values other than 0 or 1", violations)
+        self.assertIn("outside the Istanbul box", " ".join(probe.run().violations))
+
+    def test_is_open_is_ignored_whatever_it_holds(self):
+        # The app does not read isOpen (docs/adr/0014): changing, dropping or adding it is no drift.
+        for change in (lambda r: r.update(isOpen=True), lambda r: r.update(isOpen="Açık"), lambda r: r.pop("isOpen")):
+            probe = Probe()
+            for r in probe.list:
+                change(r)
+            probe.detail(1)["isOpen"] = 1
+            result = probe.run()
+            self.assertEqual(result.violations, [])
+            self.assertEqual(result.notes, [])
 
     def test_detail_answering_another_id_is_a_violation(self):
         probe = Probe()

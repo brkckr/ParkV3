@@ -3,7 +3,6 @@ package com.brkckr.parkv3.data.remote.parse
 import com.brkckr.parkv3.domain.model.Availability
 import com.brkckr.parkv3.domain.model.GeoPoint
 import com.brkckr.parkv3.domain.model.Occupancy
-import com.brkckr.parkv3.domain.model.OpenState
 import com.brkckr.parkv3.domain.model.SourceTimestamp
 import com.brkckr.parkv3.domain.model.TariffLine
 import com.brkckr.parkv3.testutil.Fixtures
@@ -27,7 +26,6 @@ class ParkJsonParserTest {
         assertThat(park.name).isEqualTo("Kadıköy Rıhtım Otoparkı")
         assertThat(park.district).isEqualTo("KADIKÖY")
         assertThat(park.location).isEqualTo(GeoPoint(40.9903, 29.0236))
-        assertThat(park.openState).isEqualTo(OpenState.OPEN)
         assertThat(park.occupancy).isEqualTo(Occupancy.Known(capacity = 200, empty = 35))
         assertThat(park.availability).isEqualTo(Availability.AVAILABLE)
         assertThat(park.workHours).isEqualTo("24 Saat")
@@ -44,33 +42,20 @@ class ParkJsonParserTest {
     }
 
     @Test
-    fun `explicit isOpen 0 is closed while missing isOpen is unknown`() {
-        assertThat(fixturePark(103).openState).isEqualTo(OpenState.CLOSED)
-        assertThat(fixturePark(103).availability).isEqualTo(Availability.CLOSED)
+    fun `isOpen is ignored whatever it holds`() {
+        // 103 sends isOpen 0 with free spaces and 104 sends no isOpen: occupancy alone decides.
+        assertThat(fixturePark(103).availability).isEqualTo(Availability.AVAILABLE)
+        assertThat(fixturePark(104).availability).isEqualTo(Availability.AVAILABLE)
 
-        assertThat(fixturePark(104).openState).isEqualTo(OpenState.UNKNOWN)
-        assertThat(fixturePark(104).availability).isEqualTo(Availability.UNKNOWN)
-    }
-
-    @Test
-    fun `isOpen values other than explicit true or false are unknown`() {
-        val json = """[
-            {"parkID": 1, "isOpen": null},
-            {"parkID": 2, "isOpen": 2},
-            {"parkID": 3, "isOpen": "Açık"},
-            {"parkID": 4, "isOpen": "false"},
-            {"parkID": 5, "isOpen": false},
-            {"parkID": 6, "isOpen": "TRUE"}
-        ]"""
-        val states = parseList(json).parks.associate { it.id to it.openState }
-        assertThat(states).containsExactly(
-            1, OpenState.UNKNOWN,
-            2, OpenState.UNKNOWN,
-            3, OpenState.UNKNOWN,
-            4, OpenState.CLOSED,
-            5, OpenState.CLOSED,
-            6, OpenState.OPEN,
-        )
+        val variants = listOf("0", "1", "true", "false", "null", "2", "\"Açık\"")
+        val json = variants
+            .mapIndexed { i, value -> """{"parkID": ${i + 1}, "capacity": 10, "emptyCapacity": 4, "isOpen": $value}""" }
+            .plus("""{"parkID": 99, "capacity": 10, "emptyCapacity": 4}""")
+            .joinToString(prefix = "[", postfix = "]")
+        val parks = parseList(json).parks
+        assertThat(parks).hasSize(variants.size + 1)
+        assertThat(parks.map { it.copy(id = 0) }.toSet()).hasSize(1)
+        assertThat(parks.first().availability).isEqualTo(Availability.AVAILABLE)
     }
 
     @Test
@@ -79,14 +64,14 @@ class ParkJsonParserTest {
         assertThat(park.capacity).isNull()
         assertThat(park.emptyCapacity).isNull()
         assertThat(park.occupancy).isEqualTo(Occupancy.Missing)
-        assertThat(park.availability).isEqualTo(Availability.OPEN_OCCUPANCY_UNKNOWN)
+        assertThat(park.availability).isEqualTo(Availability.UNKNOWN)
     }
 
     @Test
     fun `empty capacity above total capacity is inconsistent and not available`() {
         val park = fixturePark(105)
         assertThat(park.occupancy).isEqualTo(Occupancy.Inconsistent(capacity = 100, empty = 140))
-        assertThat(park.availability).isEqualTo(Availability.OPEN_OCCUPANCY_UNKNOWN)
+        assertThat(park.availability).isEqualTo(Availability.UNKNOWN)
     }
 
     @Test

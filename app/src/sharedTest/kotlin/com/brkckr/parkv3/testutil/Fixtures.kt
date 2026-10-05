@@ -1,7 +1,6 @@
 package com.brkckr.parkv3.testutil
 
 import com.brkckr.parkv3.domain.model.GeoPoint
-import com.brkckr.parkv3.domain.model.OpenState
 import com.brkckr.parkv3.domain.model.Park
 
 /** Loads SYNTHETIC fixtures from src/test/resources/fixtures (see the README there). */
@@ -23,7 +22,6 @@ fun park(
     name: String? = "Park $id",
     district: String? = null,
     location: GeoPoint? = null,
-    openState: OpenState = OpenState.OPEN,
     capacity: Int? = 100,
     emptyCapacity: Int? = 10,
 ) = Park(
@@ -31,7 +29,6 @@ fun park(
     name = name,
     district = district,
     location = location,
-    openState = openState,
     capacity = capacity,
     emptyCapacity = emptyCapacity,
     workHours = null,
@@ -47,7 +44,7 @@ class MutableClock(var now: Long) : com.brkckr.parkv3.domain.model.Clock {
     }
 }
 
-/** A minimal valid list body with ids [ids] (all open, consistent capacity, valid location). */
+/** A minimal valid list body with ids [ids] (consistent capacity, valid location; `isOpen` as the source sends it). */
 fun parkListJson(ids: Iterable<Int>): String = ids.joinToString(prefix = "[", postfix = "]") { id ->
     """{"parkID": $id, "parkName": "Otopark $id", "lat": "41.0${id % 10}", "lng": "29.0${id % 10}", "capacity": 100, "emptyCapacity": 10, "district": "TEST", "isOpen": 1}"""
 }

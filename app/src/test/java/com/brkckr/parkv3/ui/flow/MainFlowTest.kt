@@ -155,16 +155,16 @@ class MainFlowTest {
         composeRule.onNodeWithTag(MainTestTags.SEARCH).performTextClearance()
         waitForList()
 
-        // Combined filters: open AND has free spaces.
-        composeRule.onNodeWithText("Open").performClick()
+        // "Has free spaces" goes by occupancy alone; isOpen is ignored (ADR-0014).
         composeRule.onNodeWithText("Has free spaces").performClick()
-        composeRule.waitForTagGone(MainTestTags.parkRow(104)) // isOpen missing
+        composeRule.waitForTagGone(MainTestTags.parkRow(106)) // occupancy not reported
         composeRule.onNodeWithTag(MainTestTags.parkRow(102)).assertDoesNotExist() // full
-        composeRule.onNodeWithTag(MainTestTags.parkRow(103)).assertDoesNotExist() // explicitly closed
         composeRule.onNodeWithTag(MainTestTags.parkRow(105)).assertDoesNotExist() // inconsistent capacity
-        composeRule.onNodeWithTag(MainTestTags.parkRow(106)).assertDoesNotExist() // occupancy not reported
-        composeRule.onNodeWithTag(MainTestTags.parkRow(107)).assertIsDisplayed()
-        composeRule.onNodeWithTag(MainTestTags.parkRow(101)).assertIsDisplayed()
+        // 103 sends isOpen 0 and 104 sends none: both have free spaces and stay listed.
+        for (id in listOf(104, 107, 103, 101)) {
+            scrollToRow(id)
+            composeRule.onNodeWithTag(MainTestTags.parkRow(id)).assertIsDisplayed()
+        }
 
         // Detail: address and tariff as published; favorite from the detail screen.
         composeRule.onNodeWithTag(MainTestTags.parkRow(101)).performClick()

@@ -1,6 +1,5 @@
 package com.brkckr.parkv3.data.remote.parse
 
-import com.brkckr.parkv3.domain.model.OpenState
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
@@ -10,8 +9,8 @@ import kotlinx.serialization.json.booleanOrNull
 
 /**
  * Type-tolerant field readers. The source schema is undocumented, so a value may arrive as a
- * number, a numeric string or null. Anything that cannot be read unambiguously becomes null
- * (or [OpenState.UNKNOWN]); nothing defaults to 0.
+ * number, a numeric string or null. Anything that cannot be read unambiguously becomes null;
+ * nothing defaults to 0.
  */
 internal class JsonFields(private val obj: JsonObject) {
 
@@ -54,15 +53,6 @@ internal class JsonFields(private val obj: JsonObject) {
         val p = primitive(*names) ?: return null
         if (!p.isString && p.booleanOrNull != null) return null
         return parseDecimal(p.content.trim())?.takeIf { it.isFinite() }
-    }
-
-    fun openState(vararg names: String): OpenState {
-        val p = primitive(*names) ?: return OpenState.UNKNOWN
-        return when (p.content.trim().lowercase()) {
-            "1", "true" -> OpenState.OPEN
-            "0", "false" -> OpenState.CLOSED
-            else -> OpenState.UNKNOWN
-        }
     }
 
     private fun parseDecimal(text: String): Double? {

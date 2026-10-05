@@ -15,11 +15,11 @@ konular:
 | Konu | ParkV2 davranışı | ParkV3 kararı |
 |---|---|---|
 | Eksik alanlar | DTO varsayılanları `0` / `""`. Eksik değer ile 0 ayırt edilemiyor | Alanlar nullable. Eksik, geçersiz ve 0 ayrı modelleniyor ([ADR-0003](adr/0003-toleransli-ayristirma.md)) |
-| `isOpen` | `isOpen == 0` olduğunda önbellekteki değere düşüyor | `1/true` → açık, `0/false` → kapalı, diğer durumlar → **bilinmiyor** |
+| `isOpen` | `isOpen == 0` olduğunda önbellekteki değere düşüyor | Okunmuyor: anlamı belgelenmemiş ve çalışma saatleriyle çelişiyor. Uygunluk yalnızca doluluktan ([ADR-0014](adr/0014-isopen-kullanilmiyor.md)) |
 | Ücret | `fee` "Saatlik ücret" olarak etiketleniyor | Anlamı doğrulanmadığı için yalnızca "Ücret (kaynak değeri)" deniyor |
 | Poligon | Enlem/boylam sırası sayısal büyüklüğe göre tahmin ediliyor | Sıra tahmin edilmiyor: WKT standardındaki sırayla okunuyor, eksenler hiç değiştirilmiyor ve alan yalnızca otoparkın kendi konumunun çevresindeyse çiziliyor ([ADR-0012](adr/0012-alan-poligonlari.md)) |
 | Favoriler | Park tablosunda kolon olarak tutuluyor | Ayrı `favorites` tablosu; yenileme bu tabloya hiç dokunmuyor |
-| Filtre | Tek filtre seçilebiliyor | Açık + boş yer + favori filtreleri birlikte kullanılabiliyor |
+| Filtre | Tek filtre seçilebiliyor | Boş yer ve favori filtreleri birlikte kullanılabiliyor |
 | Ağ logu | `BODY` seviyesi her derlemede açık | Gövde logu yalnızca debug derlemede açık |
 | Hata metni | Sunucu gövdesi format argümanı olarak UI'a taşınıyor | Tipli hata modeli. UI yalnızca yerelleştirilmiş metin ve HTTP kodunu gösteriyor |
 

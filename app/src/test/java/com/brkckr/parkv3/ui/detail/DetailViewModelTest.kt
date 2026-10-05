@@ -4,7 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import com.brkckr.parkv3.domain.model.Availability
 import com.brkckr.parkv3.domain.model.GeoPoint
 import com.brkckr.parkv3.domain.model.Occupancy
-import com.brkckr.parkv3.domain.model.OpenState
 import com.brkckr.parkv3.domain.model.ParkDetail
 import com.brkckr.parkv3.domain.model.RefreshError
 import com.brkckr.parkv3.domain.model.RefreshResult
@@ -90,7 +89,7 @@ class DetailViewModelTest {
 
     @Test
     fun `list data is shown when the detail cannot be loaded`() = runTest {
-        repository.parks.value = listOf(park(7, openState = OpenState.CLOSED))
+        repository.parks.value = listOf(park(7, emptyCapacity = 0))
         repository.detailResults += RefreshResult.Failure(RefreshError.Http(503)) to null
         val vm = viewModel()
         collect(vm)
@@ -99,19 +98,17 @@ class DetailViewModelTest {
         val state = vm.uiState.value
         assertThat(state.content).isEqualTo(DetailContent.ListDataOnly)
         assertThat(state.error).isEqualTo(RefreshError.Http(503))
-        assertThat(state.availability).isEqualTo(Availability.CLOSED)
+        assertThat(state.availability).isEqualTo(Availability.FULL)
     }
 
     @Test
-    fun `missing isOpen stays unknown while an explicit closed state is closed`() = runTest {
-        repository.parks.value = listOf(park(7, openState = OpenState.UNKNOWN), park(8, openState = OpenState.CLOSED))
-        repository.details.value = mapOf(7 to detail(7), 8 to detail(8))
+    fun `inconsistent occupancy in the newer source is shown as unknown, not as free`() = runTest {
+        repository.parks.value = listOf(park(7, capacity = 100, emptyCapacity = 30))
+        repository.details.value = mapOf(7 to detail(7, capacity = 100, empty = 140))
+        val vm = viewModel(7).also { collect(it) }
 
-        val unknown = viewModel(7).also { collect(it) }
-        val closed = viewModel(8).also { collect(it) }
-
-        assertThat(unknown.uiState.value.availability).isEqualTo(Availability.UNKNOWN)
-        assertThat(closed.uiState.value.availability).isEqualTo(Availability.CLOSED)
+        assertThat(vm.uiState.value.occupancy).isEqualTo(Occupancy.Inconsistent(100, 140))
+        assertThat(vm.uiState.value.availability).isEqualTo(Availability.UNKNOWN)
     }
 
     @Test

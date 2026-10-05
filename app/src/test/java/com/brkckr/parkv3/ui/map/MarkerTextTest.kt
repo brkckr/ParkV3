@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.res.Resources
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.brkckr.parkv3.domain.model.OpenState
 import com.brkckr.parkv3.testutil.park
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
@@ -27,11 +26,11 @@ class MarkerTextTest {
     }
 
     @Test
-    fun `an unnamed closed park without occupancy is still described`() {
-        val text = resources.markerText(park(7, name = null, openState = OpenState.CLOSED, capacity = null, emptyCapacity = null))
+    fun `an unnamed park without occupancy is still described`() {
+        val text = resources.markerText(park(7, name = null, capacity = null, emptyCapacity = null))
 
         assertThat(text.title).isEqualTo("Unnamed car park (#7)")
-        assertThat(text.snippet).isEqualTo("Closed (per source) · Occupancy not reported")
+        assertThat(text.snippet).isEqualTo("Occupancy unknown · Occupancy not reported")
     }
 
     @Test

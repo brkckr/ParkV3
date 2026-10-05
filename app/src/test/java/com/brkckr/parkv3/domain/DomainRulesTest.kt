@@ -4,7 +4,6 @@ import com.brkckr.parkv3.domain.model.Availability
 import com.brkckr.parkv3.domain.model.FreshnessPolicy
 import com.brkckr.parkv3.domain.model.GeoPoint
 import com.brkckr.parkv3.domain.model.Occupancy
-import com.brkckr.parkv3.domain.model.OpenState
 import com.brkckr.parkv3.domain.model.RefreshError
 import com.brkckr.parkv3.domain.model.SyncInfo
 import com.google.common.truth.Truth.assertThat
@@ -25,11 +24,11 @@ class DomainRulesTest {
     }
 
     @Test
-    fun `closed wins over occupancy and unknown open state is never reported as available`() {
-        assertThat(Availability.of(OpenState.CLOSED, Occupancy.Known(10, 5))).isEqualTo(Availability.CLOSED)
-        assertThat(Availability.of(OpenState.UNKNOWN, Occupancy.Known(10, 5))).isEqualTo(Availability.UNKNOWN)
-        assertThat(Availability.of(OpenState.OPEN, Occupancy.Known(10, 0))).isEqualTo(Availability.FULL)
-        assertThat(Availability.of(OpenState.OPEN, Occupancy.Missing)).isEqualTo(Availability.OPEN_OCCUPANCY_UNKNOWN)
+    fun `availability comes from occupancy alone and unknown occupancy is never free or full`() {
+        assertThat(Availability.of(Occupancy.Known(10, 5))).isEqualTo(Availability.AVAILABLE)
+        assertThat(Availability.of(Occupancy.Known(10, 0))).isEqualTo(Availability.FULL)
+        assertThat(Availability.of(Occupancy.Missing)).isEqualTo(Availability.UNKNOWN)
+        assertThat(Availability.of(Occupancy.Inconsistent(10, 11))).isEqualTo(Availability.UNKNOWN)
     }
 
     @Test

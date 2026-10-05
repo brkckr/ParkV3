@@ -8,7 +8,6 @@
     <string name="action_refresh">Yenile</string>
     <string name="view_map">Harita</string>
     <string name="view_list">Liste</string>
-    <string name="filter_open">Açık</string>
     <string name="filter_available">Boş yeri olan</string>
     <string name="filter_favorites">Favoriler</string>
     <string name="filters_clear">Filtreleri temizle</string>
@@ -76,9 +75,7 @@
     <!-- Otopark durumu -->
     <string name="status_available">Boş yer var</string>
     <string name="status_full">Dolu</string>
-    <string name="status_closed">Kapalı (kaynağa göre)</string>
-    <string name="status_open_unknown_occupancy">Açık, doluluk bilinmiyor</string>
-    <string name="status_unknown">Durum bilinmiyor</string>
+    <string name="status_unknown">Doluluk bilinmiyor</string>
     <plurals name="occupancy_known">
         <item quantity="one">%2$d yerden %1$d boş</item>
         <item quantity="other">%2$d yerden %1$d boş</item>
@@ -97,7 +94,6 @@
     <string name="detail_title">Otopark detayı</string>
     <string name="action_back">Geri</string>
     <string name="detail_status">Durum</string>
-    <string name="detail_status_source">Açık/kapalı bilgisi listeden alınır (%1$s).</string>
     <string name="detail_occupancy">Doluluk</string>
     <string name="detail_capacity">Kapasite</string>
     <string name="detail_free_spaces">Boş yer</string>

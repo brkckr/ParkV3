@@ -11,7 +11,6 @@ import com.brkckr.parkv3.domain.model.Clock
 import com.brkckr.parkv3.domain.model.FreshnessPolicy
 import com.brkckr.parkv3.domain.model.GeoPoint
 import com.brkckr.parkv3.domain.model.Occupancy
-import com.brkckr.parkv3.domain.model.OpenState
 import com.brkckr.parkv3.domain.model.Park
 import com.brkckr.parkv3.domain.model.ParkDetail
 import com.brkckr.parkv3.domain.model.RefreshError
@@ -43,7 +42,7 @@ sealed interface DetailContent {
 
 data class DetailUiState(
     val parkId: Int,
-    /** List record; the source of the open/closed state (ParkDetay has none). */
+    /** List record; fills in what the detail lacks and gives occupancy when it is the newer one. */
     val park: Park? = null,
     val isListed: Boolean = false,
     val detail: ParkDetail? = null,
@@ -65,8 +64,7 @@ data class DetailUiState(
             park != null -> park.occupancy
             else -> Occupancy.Missing
         }
-    val openState: OpenState get() = park?.openState ?: OpenState.UNKNOWN
-    val availability: Availability get() = Availability.of(openState, occupancy)
+    val availability: Availability get() = Availability.of(occupancy)
     val name: String? get() = detail?.name ?: park?.name
     val district: String? get() = detail?.district ?: park?.district
     val location: GeoPoint? get() = detail?.location ?: park?.location

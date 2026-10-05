@@ -20,14 +20,13 @@ LIST_FIELDS = {
     "lng": {"str"},
     "capacity": {"int"},
     "emptyCapacity": {"int"},
-    "isOpen": {"int"},
     "workHours": {"str"},
     "parkType": {"str"},
     "district": {"str"},
     "freeTime": {"int"},
 }
 DETAIL_FIELDS = {
-    **{name: types for name, types in LIST_FIELDS.items() if name != "isOpen"},
+    **LIST_FIELDS,
     "locationName": {"str"},
     "address": {"str"},
     "monthlyFee": {"float"},
@@ -35,6 +34,9 @@ DETAIL_FIELDS = {
     "updateDate": {"str", "null"},
     "areaPolygon": {"str"},
 }
+# Sent by the source but never read by the app, so their presence, type or values are not
+# checked (isOpen: docs/adr/0014).
+IGNORED_FIELDS = {"isOpen"}
 
 MIN_LIST_RECORDS = 123  # half of the 246 measured records, like the app's shrink guard
 TOLERANCE = 0.05  # share of records that may differ before it counts as a change
@@ -188,7 +190,7 @@ def check_fields(label, records, expected, result):
             differing / total,
             f"{label}: `{name}` types {dict(types[name])}, expected {sorted(allowed)} ({differing}/{total} differ)",
         )
-    for name in sorted(set(present) - set(expected)):
+    for name in sorted(set(present) - set(expected) - IGNORED_FIELDS):
         result.flag(present[name] / total, f"{label}: new field `{name}` {dict(types[name])} in {present[name]}/{total} records")
 
 
@@ -210,8 +212,6 @@ def check_list(status, data, result):
     result.flag(no_id / total, f"Park: {no_id}/{total} records without a usable parkID")
     outside = sum(not in_istanbul(r) for r in records)
     result.flag(outside / total, f"Park: {outside}/{total} coordinates missing or outside the Istanbul box")
-    odd_open = sum(json_type(r.get("isOpen")) != "int" or r.get("isOpen") not in (0, 1) for r in records)
-    result.flag(odd_open / total, f"Park: {odd_open}/{total} isOpen values other than 0 or 1")
     return records
 
 

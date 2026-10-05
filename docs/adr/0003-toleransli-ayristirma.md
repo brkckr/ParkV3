@@ -11,15 +11,15 @@ döndüğünü gösterdi. Tipler zamanla değişebilir.
   toleranslı okuyucularla tek tek ayrıştırılıyor. Sabit tipli DTO ile gelen "tip uyuşmazlığı
   yüzünden tüm liste düştü" riskinden kaçınılıyor.
 - **Eksik ≠ 0**: Tüm sayısal alanlar nullable. Varsayılan değer olarak `0` kullanılmıyor.
-- **Açık/kapalı/bilinmiyor**: `OpenState { OPEN, CLOSED, UNKNOWN }`. Yalnızca açık değerler
-  eşleniyor. Diğer her şey `UNKNOWN`. Önceki değere veya `workHours` metnine düşülmüyor.
+- **Açık/kapalı**: [ADR-0014](0014-isopen-kullanilmiyor.md) ile değişti. İlk sürüm `isOpen`
+  değerini `OpenState { OPEN, CLOSED, UNKNOWN }` olarak okuyordu. Artık alan hiç okunmuyor.
+  Açıklık `workHours` metninden de çıkarılmıyor.
 - **Doluluk**: `Occupancy.Known(capacity, empty)` yalnızca `capacity > 0` ve
   `0 ≤ empty ≤ capacity` olduğunda. Alan eksikse `Missing`, değerler çelişkiliyse
   `Inconsistent`. Tutarsız sayılar UI'da gösterilmiyor; "Doluluk verisi tutarsız" yazıyor.
-- **Uygunluk** (`Availability`): kapalı → `CLOSED`. Açık ve `Known` iken boş > 0 →
-  `AVAILABLE`, boş = 0 → `FULL`. Açık ama doluluk bilinmiyorsa → `OPEN_OCCUPANCY_UNKNOWN`.
-  Açıklık bilinmiyorsa → `UNKNOWN`. "Boş yeri olan" filtresi yalnızca `AVAILABLE` kayıtları
-  geçiriyor, "Açık" filtresi yalnızca `OpenState.OPEN` kayıtlarını.
+- **Uygunluk** (`Availability`): yalnızca doluluktan ([ADR-0014](0014-isopen-kullanilmiyor.md)).
+  `Known` iken boş > 0 → `AVAILABLE`, boş = 0 → `FULL`. Doluluk eksik veya tutarsızsa →
+  `UNKNOWN`. "Boş yeri olan" filtresi yalnızca `AVAILABLE` kayıtları geçiriyor.
 - **Koordinat**: Sonlu, (0,0) olmayan ve İstanbul kutusu içinde olan değerler geçerli.
   Geçersiz kayıt listede "Konum bilgisi yok" etiketiyle görünüyor, haritada gösterilmiyor.
   Enlem ile boylam büyüklüğe bakılarak yer değiştirilmiyor.

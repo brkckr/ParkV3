@@ -19,7 +19,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.brkckr.parkv3.domain.ParkFilters
 import com.brkckr.parkv3.domain.ParkListQuery
 import com.brkckr.parkv3.domain.model.GeoPoint
-import com.brkckr.parkv3.domain.model.OpenState
 import com.brkckr.parkv3.domain.model.SyncInfo
 import com.brkckr.parkv3.testutil.park
 import com.brkckr.parkv3.ui.main.MainActions
@@ -43,8 +42,8 @@ class AccessibilityAndLocaleTest {
 
     private val parks = listOf(
         park(1, name = "Kadıköy Rıhtım Otoparkı", district = "KADIKÖY", location = GeoPoint(40.99, 29.02), emptyCapacity = 30),
-        park(2, name = "Şişli Merkez Katlı", district = "ŞİŞLİ", openState = OpenState.CLOSED),
-        park(3, name = "Beşiktaş Sahil", district = "BEŞİKTAŞ", openState = OpenState.UNKNOWN),
+        park(2, name = "Şişli Merkez Katlı", district = "ŞİŞLİ", emptyCapacity = 0),
+        park(3, name = "Beşiktaş Sahil", district = "BEŞİKTAŞ", capacity = null, emptyCapacity = null),
     )
 
     private fun state() = MainUiState(
@@ -64,8 +63,9 @@ class AccessibilityAndLocaleTest {
         render()
 
         composeRule.onNodeWithText("Boş yeri olan").assertIsDisplayed()
-        composeRule.onNodeWithText("Kapalı (kaynağa göre)").assertIsDisplayed()
-        composeRule.onNodeWithText("Durum bilinmiyor").assertIsDisplayed()
+        composeRule.onNodeWithText("Dolu").assertIsDisplayed()
+        composeRule.onNodeWithText("Doluluk bilinmiyor").assertIsDisplayed()
+        composeRule.onNodeWithText("Doluluk bildirilmedi").assertIsDisplayed()
         composeRule.onNodeWithText("100 yerden 30 boş").assertIsDisplayed()
         composeRule.onNodeWithText("Son güncelleme", substring = true).assertIsDisplayed()
     }

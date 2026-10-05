@@ -71,7 +71,7 @@ data class MainUiState(
             items.isNotEmpty() -> ListContent.Items
             filters.favoritesOnly && favoriteCount == 0 -> ListContent.NoFavorites
             filters.favoritesOnly && orphanFavorites.isNotEmpty() && query.isBlank() &&
-                !filters.openOnly && !filters.availableOnly -> ListContent.Items
+                !filters.availableOnly -> ListContent.Items
             query.isNotBlank() -> ListContent.NoSearchResults(query.trim())
             else -> ListContent.NoFilterResults
         }

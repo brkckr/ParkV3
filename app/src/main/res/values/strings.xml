@@ -8,7 +8,6 @@
     <string name="action_refresh">Refresh</string>
     <string name="view_map">Map</string>
     <string name="view_list">List</string>
-    <string name="filter_open">Open</string>
     <string name="filter_available">Has free spaces</string>
     <string name="filter_favorites">Favorites</string>
     <string name="filters_clear">Clear filters</string>
@@ -76,9 +75,7 @@
     <!-- Park status -->
     <string name="status_available">Free spaces</string>
     <string name="status_full">Full</string>
-    <string name="status_closed">Closed (per source)</string>
-    <string name="status_open_unknown_occupancy">Open, occupancy unknown</string>
-    <string name="status_unknown">Status unknown</string>
+    <string name="status_unknown">Occupancy unknown</string>
     <plurals name="occupancy_known">
         <item quantity="one">%1$d free space of %2$d</item>
         <item quantity="other">%1$d free spaces of %2$d</item>
@@ -97,7 +94,6 @@
     <string name="detail_title">Car park details</string>
     <string name="action_back">Back</string>
     <string name="detail_status">Status</string>
-    <string name="detail_status_source">Open/closed comes from the list (%1$s).</string>
     <string name="detail_occupancy">Occupancy</string>
     <string name="detail_capacity">Capacity</string>
     <string name="detail_free_spaces">Free spaces</string>

@@ -13,7 +13,6 @@ import com.brkckr.parkv3.domain.ParkFilters
 import com.brkckr.parkv3.domain.ParkListQuery
 import com.brkckr.parkv3.domain.model.Clock
 import com.brkckr.parkv3.domain.model.GeoPoint
-import com.brkckr.parkv3.domain.model.OpenState
 import com.brkckr.parkv3.domain.model.ParkDetail
 import com.brkckr.parkv3.domain.model.RefreshError
 import com.brkckr.parkv3.domain.model.SourceTimestamp
@@ -67,8 +66,8 @@ class ScreenshotTest {
     private val parks = listOf(
         park(1, name = "Kadıköy Rıhtım Otoparkı", district = "KADIKÖY", location = GeoPoint(40.9903, 29.0236), emptyCapacity = 30),
         park(2, name = "Moda Sahil Açık Otoparkı", district = "KADIKÖY", location = GeoPoint(40.9810, 29.0260), emptyCapacity = 0),
-        park(3, name = "Şişli Merkez Katlı Otoparkı", district = "ŞİŞLİ", location = GeoPoint(41.0602, 28.9877), openState = OpenState.CLOSED),
-        park(4, name = "Beşiktaş Sahil", district = "BEŞİKTAŞ", location = GeoPoint(41.0422, 29.0083), openState = OpenState.UNKNOWN),
+        park(3, name = "Şişli Merkez Katlı Otoparkı", district = "ŞİŞLİ", location = GeoPoint(41.0602, 28.9877), capacity = 10, emptyCapacity = 50),
+        park(4, name = "Beşiktaş Sahil", district = "BEŞİKTAŞ", location = GeoPoint(41.0422, 29.0083)),
         park(5, name = null, district = "FATİH", location = GeoPoint(41.0082, 28.9784), capacity = null, emptyCapacity = null),
     )
 
