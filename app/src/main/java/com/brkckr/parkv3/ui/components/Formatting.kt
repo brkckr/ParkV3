@@ -1,5 +1,6 @@
 package com.brkckr.parkv3.ui.components
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
@@ -40,6 +41,16 @@ fun rememberNow(): Long {
 @Composable
 @ReadOnlyComposable
 fun currentLocale(): Locale = LocalConfiguration.current.locales[0]
+
+/** Non-composable variant for snackbars and other one-off messages. */
+fun Context.refreshErrorMessage(error: RefreshError): String = when (error) {
+    RefreshError.Network -> getString(R.string.error_network)
+    is RefreshError.Http -> getString(R.string.error_http, error.code)
+    RefreshError.Malformed -> getString(R.string.error_malformed)
+    RefreshError.EmptyResponse -> getString(R.string.error_empty)
+    RefreshError.NotFound -> getString(R.string.error_not_found)
+    RefreshError.Unexpected -> getString(R.string.error_unexpected)
+}
 
 /** Server text is never shown; only typed, localized reasons (and an HTTP status code). */
 @Composable
