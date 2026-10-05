@@ -1,8 +1,8 @@
 name: Instrumented tests
 
-# Device tests (Room schema/migration, main flow) on emulators. Separate from the main CI
-# because an emulator run takes several minutes. API 34 is the required check; API 37 runs
-# the app on Android 17 with its targetSdk 37 behavior changes (docs/adr/0015).
+# Device tests (Room schema/migration, main flow) on an emulator. Separate from the main CI
+# because an emulator run takes several minutes. An API 37 (Android 17) emulator was tried and
+# removed: on GitHub runners its system services did not settle (docs/adr/0015).
 on:
   pull_request:
   workflow_dispatch:
@@ -16,19 +16,9 @@ permissions:
 
 jobs:
   connected:
-    name: Emulator (API ${{ matrix.api-level }})
+    name: Emulator (API 34)
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - api-level: 34
-            sdk-level: "34"
-          # Since API 36.1 the SDK publishes platforms and system images under a minor
-          # version: there is no "android-37", only "android-37.0" (and later 37.x).
-          - api-level: 37
-            sdk-level: "37.0"
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-java@v5
@@ -46,13 +36,17 @@ jobs:
       - name: Run connected tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: ${{ matrix.sdk-level }}
+          api-level: 34
           arch: x86_64
           target: google_apis
           profile: pixel_6
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          script: ./gradlew --stacktrace connectedDebugAndroidTest
+          # The action runs each line on its own.
+          script: |
+            bash .github/scripts/emulator-ready.sh
+            ./gradlew --stacktrace connectedDebugAndroidTest
+            bash .github/scripts/emulator-diagnostics.sh
       - name: Print device test failures
         if: always()
         run: |
@@ -68,11 +62,15 @@ jobs:
                           failed += 1
                           print(f"FAILED {case.get('classname')}.{case.get('name')}\n{(node.text or node.get('message') or '')[:4000]}\n")
           print(f"device tests: {total} run, {failed} failed")
+          # Gradle can end successfully when the APK never got installed; no tests is a failure.
+          if total == 0:
+              print("::error::No device tests ran")
+          raise SystemExit(1 if total == 0 or failed else 0)
           PY
       - name: Upload device test reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: instrumented-test-reports-api-${{ matrix.api-level }}
+          name: instrumented-test-reports
           path: app/build/reports/androidTests/
           if-no-files-found: ignore
