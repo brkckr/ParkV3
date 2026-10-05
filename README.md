@@ -94,7 +94,7 @@ Ayrıntılar, istenen 10 senaryonun hangi testlerle karşılandığı ve cihaz t
 
 GitHub Actions iş akışları:
 - **Android CI**: unit testler, lint, debug APK (her PR'da)
-- **Instrumented tests**: API 34 emülatörde cihaz testleri
+- **Instrumented tests**: API 34 ve API 37 (Android 17) emülatörlerinde cihaz testleri
 - **Screenshot tests**: ana ekranların görüntülerini kaydeder (main) ve PR'larda karşılaştırır
 - **API contract probe**: canlı İSPARK uç noktalarını ölçer ve sözleşmeyle karşılaştırır.
   Haftalık ve elle çalışır, sapma bulursa issue açar

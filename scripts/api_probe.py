@@ -11,9 +11,12 @@ import collections
 import datetime
 import json
 import os
+import socket
+import ssl
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 
 import api_contract
@@ -38,6 +41,20 @@ def fetch(url):
         return e.code, dict(e.headers or {}), e.read() if e.fp else b"", time.monotonic() - started, None
     except Exception as e:  # network failure: report, do not crash
         return None, {}, b"", time.monotonic() - started, repr(e)
+
+
+def peer_certificate(base):
+    """(host, DER certificate or None, issuer, error) for an HTTPS base URL; None otherwise."""
+    url = urllib.parse.urlsplit(base)
+    if url.scheme != "https":
+        return None
+    try:
+        with socket.create_connection((url.hostname, url.port or 443), timeout=30) as sock:
+            with ssl.create_default_context().wrap_socket(sock, server_hostname=url.hostname) as tls:
+                issuer = ", ".join(f"{k}={v}" for rdn in tls.getpeercert().get("issuer", ()) for k, v in rdn)
+                return url.hostname, tls.getpeercert(binary_form=True), issuer, None
+    except Exception as e:  # network or TLS failure: report, do not crash
+        return url.hostname, None, None, repr(e)
 
 
 def field_table(records):
@@ -177,6 +194,15 @@ def main():
                   f"`{body[:200].decode('utf-8', 'replace')}`\n")
     unknown_response = (UNKNOWN_ID, status, decode(body))
 
+    certificate = None
+    tls = peer_certificate(BASE)
+    if tls is not None:
+        host, der, issuer, err = tls
+        certificate = (host, der, issuer)
+        scts = api_contract.embedded_scts(der) if der else None
+        report.append(f"## TLS certificate ({host})\n\nissuer: {issuer}, embedded SCTs={scts}, "
+                      f"bytes={len(der) if der else 0}, error={err}\n")
+
     if unreachable(list_status):
         report.append("## Contract check\n\nSkipped: the list endpoint could not be reached "
                       "(network error or HTTP 5xx). Nothing is concluded from this run.\n")
@@ -184,7 +210,7 @@ def main():
     else:
         # Detail requests that hit an outage say nothing about the contract either.
         reachable = {pid: r for pid, r in detail_responses.items() if not unreachable(r[0])}
-        result = api_contract.check(list_response, reachable, unknown_response)
+        result = api_contract.check(list_response, reachable, unknown_response, certificate)
         report += api_contract.report_lines(result)
         exit_code = EXIT_VIOLATION if result.violations else 0
         if result.violations:

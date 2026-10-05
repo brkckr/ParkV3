@@ -52,6 +52,12 @@ MS_DATE = re.compile(r"^/Date\((-?\d+)([+-]\d{4})?\)/$")
 WKT_POLYGON = re.compile(r"^\s*(MULTI)?POLYGON\s*\(", re.IGNORECASE)
 WKT_PAIR = re.compile(r"(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)")
 
+# Android 17 enforces certificate transparency for apps targeting API 37 (docs/adr/0015):
+# the server certificate must carry signed certificate timestamps (SCTs) from CT logs.
+# Embedded SCTs (RFC 6962 section 3.3) are checked; two is the usual minimum of CT policies.
+SCT_LIST_OID = bytes.fromhex("060a2b06010401d679020402")  # 1.3.6.1.4.1.11129.2.4.2
+MIN_EMBEDDED_SCTS = 2
+
 
 @dataclass
 class ContractResult:
@@ -269,10 +275,67 @@ def check_unknown_id(requested_id, status, data, result):
         )
 
 
-def check(list_response, detail_responses, unknown_response):
+def _der_length(buf, i):
+    """(length, offset of the content) for the DER length that starts at buf[i]."""
+    first = buf[i]
+    if first < 0x80:
+        return first, i + 1
+    size = first & 0x7F
+    return int.from_bytes(buf[i + 1:i + 1 + size], "big"), i + 1 + size
+
+
+def embedded_scts(cert_der):
+    """How many SCTs a DER certificate embeds; 0 when it has none or they cannot be read."""
+    at = cert_der.find(SCT_LIST_OID)
+    if at < 0:
+        return 0
+    try:
+        i = at + len(SCT_LIST_OID)
+        if cert_der[i] == 0x01:  # optional "critical" BOOLEAN
+            length, i = _der_length(cert_der, i + 1)
+            i += length
+        if cert_der[i] != 0x04:  # extnValue OCTET STRING
+            return 0
+        length, i = _der_length(cert_der, i + 1)
+        value = cert_der[i:i + length]
+        if not value or value[0] != 0x04:  # the SCT list, itself an OCTET STRING
+            return 0
+        length, i = _der_length(value, 1)
+        tls = value[i:i + length]  # TLS-encoded SignedCertificateTimestampList
+        end = min(len(tls), 2 + int.from_bytes(tls[:2], "big"))
+        count, pos = 0, 2
+        while pos + 2 <= end:
+            size = int.from_bytes(tls[pos:pos + 2], "big")
+            if size == 0 or pos + 2 + size > end:
+                break
+            count += 1
+            pos += 2 + size
+        return count
+    except IndexError:
+        return 0
+
+
+def check_certificate(host, cert_der, issuer, result):
+    if cert_der is None:
+        result.notes.append(f"{host}: the TLS certificate could not be read, certificate transparency not checked")
+        return
+    count = embedded_scts(cert_der)
+    if count < MIN_EMBEDDED_SCTS:
+        result.violations.append(
+            f"{host}: TLS certificate (issuer: {issuer}) embeds {count} SCT(s), expected at least "
+            f"{MIN_EMBEDDED_SCTS}. Android 17 enforces certificate transparency for the app (targetSdk 37). "
+            "SCTs sent in a TLS extension or OCSP response are not checked here, and a TLS-intercepting "
+            "proxy in front of the probe also shows up as 0"
+        )
+
+
+def check(list_response, detail_responses, unknown_response, certificate=None):
     """list_response = (status, data); detail_responses = {id: (status, data)};
-    unknown_response = (id, status, data). `data` is the decoded JSON, or None."""
+    unknown_response = (id, status, data); certificate = (host, DER bytes or None, issuer), or
+    None when the source is not reached over HTTPS. `data` is the decoded JSON, or None."""
     result = ContractResult()
+    if certificate is not None:
+        check_certificate(*certificate, result)
     check_list(*list_response, result)
     details = [record for pid, (status, data) in detail_responses.items()
                if (record := check_detail(pid, status, data, result)) is not None]

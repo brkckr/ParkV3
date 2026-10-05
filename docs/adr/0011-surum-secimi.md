@@ -29,6 +29,6 @@ Central metadata.
 | androidx.test | core/runner/rules 1.7.0, ext.junit 1.3.0, espresso 3.7.0 | AndroidX |
 
 compileSdk = 37 (AGP 9.4'ün desteklediği en yüksek API. Core 1.19 ve Activity 1.13 AAR'ları
-yeni compileSdk isteyebiliyor), targetSdk = 36 (Android 17 davranış değişiklikleri cihazda
-test edilmeden hedeflenmedi. Backlog'da), minSdk = 26 (java.time ve adaptive icon desteği,
+yeni compileSdk isteyebiliyor), targetSdk = 37 (Android 17 davranış değişiklikleri
+değerlendirildikten sonra, [ADR-0015](0015-target-sdk-37.md)), minSdk = 26 (java.time ve adaptive icon desteği,
 cihazların büyük çoğunluğu).

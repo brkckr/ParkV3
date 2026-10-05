@@ -1,25 +1,26 @@
 # İkinci Sürüm Backlog'u (öncelik sırasıyla)
 
-## P1 — Veri doğruluğu ve güvenilirlik
-1. **targetSdk 37.** Android 17 davranış değişiklikleri cihazda test edildikten sonra.
-
 ## P2 — Ürün
-2. **Adres/yer araması** (hedefi adla seçmek). Places/Geocoding API ücretli. Maliyet ve
+1. **Adres/yer araması** (hedefi adla seçmek). Places/Geocoding API ücretli. Maliyet ve
    hesap kararı gerektiriyor.
-3. **Harita küme balonlarının erişilebilirliği.** İşaretler ekran okuyucuya ad, durum ve
+2. **Harita küme balonlarının erişilebilirliği.** İşaretler ekran okuyucuya ad, durum ve
    doluluk veriyor. Küme balonlarının (birden çok otopark) etiketi yok. maps-compose'un küme
    çizicisini özelleştirmek gerekiyor. Ayrıca TalkBack ile gerçek cihazda deneme.
 
 ## P3 — Mühendislik
-4. **Kalan bağımlılık güncellemeleri.** Gradle 9.8.0 (sağlama toplamı bu ortamdan
+3. **Kalan bağımlılık güncellemeleri.** Gradle 9.8.0 (sağlama toplamı bu ortamdan
    alınamadı) ve Google Maven'daki kütüphaneler (`play-services-location`, AndroidX, AGP).
    Google Maven'a erişebilen bir ortamda kontrol edilmeli.
-5. **Baseline profile ve açılış performansı ölçümü.**
-6. **Release imzalama CI'ı.** İmza anahtarı GitHub secrets'ta, AAB üretimi. Mağazaya
+4. **Baseline profile ve açılış performansı ölçümü.**
+5. **Release imzalama CI'ı.** İmza anahtarı GitHub secrets'ta, AAB üretimi. Mağazaya
    yükleme yok.
-7. **Ekran sayısı artarsa modüllere ayırma** (`:core:data`, `:feature:map` vb.).
+6. **Ekran sayısı artarsa modüllere ayırma** (`:core:data`, `:feature:map` vb.).
 
 ## Tamamlananlar
+- **targetSdk 37** (eski P1). Android 17 davranış değişiklikleri tek tek değerlendirildi.
+  Cihaz testleri API 37 emülatöründe de koşuyor. API probu sunucu sertifikasının sertifika
+  şeffaflığı şartını karşıladığını kontrol ediyor ([ADR-0015](adr/0015-target-sdk-37.md)).
+  Fiziksel cihazda denenmedi.
 - **`isOpen` belirsizliği** (eski P1 #1). İBB'den açıklama beklenmeden kapatıldı: alan artık
   okunmuyor. "Açık" filtresi ve "Kapalı" etiketi kaldırıldı, uygunluk yalnızca dolulukla
   belirleniyor. Veritabanı sürüm 2, favoriler korunuyor
