@@ -120,6 +120,7 @@ class MainFlowTest {
         // Detail: address and tariff as published; favorite from the detail screen.
         composeRule.onNodeWithTag(MainTestTags.parkRow(101)).performClick()
         composeRule.waitForText("Rıhtım Cad. No:1 Kadıköy/İstanbul")
+        composeRule.waitForIdle() // let the navigation transition finish before touching shared labels
         composeRule.onNodeWithText("0-1 Saat").assertExists()
         composeRule.onNodeWithContentDescription("Add to favorites").performClick()
         composeRule.onNodeWithContentDescription("Remove from favorites").assertIsDisplayed()
@@ -127,6 +128,7 @@ class MainFlowTest {
 
         // Favorites filter now combines with the others.
         composeRule.waitForTag(MainTestTags.SEARCH)
+        composeRule.waitForIdle()
         composeRule.onNodeWithText("Favorites").performClick()
         composeRule.waitUntil(5_000) { composeRule.onAllNodes(hasTestTag(MainTestTags.parkRow(107))).fetchSemanticsNodes().isEmpty() }
         composeRule.onNodeWithTag(MainTestTags.parkRow(101)).assertIsDisplayed()

@@ -61,10 +61,12 @@ class MainFlowDeviceTest {
 
         composeRule.onNodeWithTag(MainTestTags.parkRow(101)).performClick()
         composeRule.waitUntil(15_000) { composeRule.onAllNodes(hasText("Rıhtım Cad. No:1 Kadıköy/İstanbul")).fetchSemanticsNodes().isNotEmpty() }
+        composeRule.waitForIdle()
 
         composeRule.onNodeWithContentDescription("Add to favorites").performClick()
         composeRule.onNodeWithContentDescription("Remove from favorites").assertIsDisplayed()
         composeRule.onNodeWithContentDescription("Back").performClick()
+        composeRule.waitForIdle()
 
         composeRule.onNodeWithText("Favorites").performClick()
         composeRule.onNodeWithTag(MainTestTags.parkRow(101)).assertIsDisplayed()

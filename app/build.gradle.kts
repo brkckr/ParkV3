@@ -64,15 +64,16 @@ android {
     }
 
     sourceSets {
-        // Test doubles, the fake server and SYNTHETIC fixtures are shared by JVM and device tests.
+        // Test doubles, the fake server and SYNTHETIC fixtures are shared by JVM and device
+        // tests. Built-in Kotlin only reads extra sources from the `kotlin` set.
+        // (The Room plugin already adds app/schemas to the androidTest assets.)
         getByName("test") {
-            java.directories.add("src/sharedTest/java")
+            kotlin.directories.add("src/sharedTest/kotlin")
             resources.directories.add("src/sharedTest/resources")
         }
         getByName("androidTest") {
-            java.directories.add("src/sharedTest/java")
+            kotlin.directories.add("src/sharedTest/kotlin")
             resources.directories.add("src/sharedTest/resources")
-            assets.directories.add("$projectDir/schemas")
         }
     }
 
