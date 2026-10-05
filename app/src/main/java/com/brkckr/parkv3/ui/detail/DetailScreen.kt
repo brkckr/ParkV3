@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -47,6 +48,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleStartEffect
@@ -157,7 +159,14 @@ fun DetailScreen(
                     title = stringResource(R.string.detail_error_title),
                     body = stringResource(R.string.detail_error_body, refreshErrorText(content.error)),
                 ) { OutlinedButton(onClick = onRetry) { Text(stringResource(R.string.action_retry)) } }
-                DetailContent.ListDataOnly, DetailContent.Full -> DetailBody(state, onRetry, onDirections, onShowOnMap)
+                // Readable line length on tablets and in landscape.
+                DetailContent.ListDataOnly, DetailContent.Full -> DetailBody(
+                    state = state,
+                    onRetry = onRetry,
+                    onDirections = onDirections,
+                    onShowOnMap = onShowOnMap,
+                    modifier = Modifier.widthIn(max = DETAIL_MAX_WIDTH).align(Alignment.TopCenter),
+                )
             }
             if (state.isRefreshing && state.content != DetailContent.Loading) {
                 LinearProgressIndicator(Modifier.fillMaxWidth().align(Alignment.TopCenter))
@@ -168,11 +177,17 @@ fun DetailScreen(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun DetailBody(state: DetailUiState, onRetry: () -> Unit, onDirections: () -> Unit, onShowOnMap: (() -> Unit)?) {
+private fun DetailBody(
+    state: DetailUiState,
+    onRetry: () -> Unit,
+    onDirections: () -> Unit,
+    onShowOnMap: (() -> Unit)?,
+    modifier: Modifier = Modifier,
+) {
     val now = rememberNow(state.detail?.fetchedAtMillis, state.listUpdatedAtMillis)
     val detail = state.detail
     Column(
-        Modifier
+        modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(bottom = 24.dp),
@@ -325,3 +340,5 @@ private fun Notice(text: String, actionLabel: String? = null, onAction: (() -> U
         }
     }
 }
+
+private val DETAIL_MAX_WIDTH: Dp = 640.dp

@@ -10,12 +10,15 @@ import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Refresh
@@ -31,6 +34,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -195,7 +199,21 @@ fun MainRoute(
 }
 
 @Composable
-fun MainScreen(state: MainUiState, actions: MainActions, snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }) {
+fun MainScreen(
+    state: MainUiState,
+    actions: MainActions,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    mapPane: @Composable (Modifier) -> Unit = { modifier ->
+        ParkMapPane(
+            state = state,
+            onSelectPark = actions.onSelectPark,
+            onSetDestination = actions.onSetDestination,
+            onOpenDetail = actions.onOpenDetail,
+            onDirections = actions.onDirections,
+            modifier = modifier,
+        )
+    },
+) {
     val hasContent = state.totalCount > 0
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -208,92 +226,95 @@ fun MainScreen(state: MainUiState, actions: MainActions, snackbarHostState: Snac
             )
         },
     ) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding)) {
-            Surface(tonalElevation = 2.dp) {
-                Column(Modifier.padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 4.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        SearchField(
-                            query = state.query,
-                            onQueryChange = actions.onQueryChange,
-                            onClear = actions.onClearQuery,
-                            modifier = Modifier.weight(1f),
-                        )
-                        IconButton(onClick = actions.onRefresh, enabled = !state.isRefreshing) {
-                            Icon(Icons.Filled.Refresh, contentDescription = stringResource(R.string.action_refresh))
-                        }
-                    }
-                    FilterRow(
-                        filters = state.filters,
-                        onToggleOpen = actions.onToggleOpen,
-                        onToggleAvailable = actions.onToggleAvailable,
-                        onToggleFavorites = actions.onToggleFavorites,
-                        modifier = Modifier.padding(top = 4.dp),
-                    )
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.fillMaxWidth().padding(end = 8.dp),
-                    ) {
-                        if (hasContent) {
-                            Text(
-                                pluralStringResource(R.plurals.result_count, state.totalCount, state.items.size, state.totalCount),
-                                style = MaterialTheme.typography.labelLarge,
+        BoxWithConstraints(Modifier.fillMaxSize().padding(padding)) {
+            val width = maxWidth
+            Column(Modifier.fillMaxSize()) {
+                Surface(tonalElevation = 2.dp) {
+                    Column(Modifier.padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 4.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            SearchField(
+                                query = state.query,
+                                onQueryChange = actions.onQueryChange,
+                                onClear = actions.onClearQuery,
                                 modifier = Modifier.weight(1f),
                             )
-                        } else {
-                            Spacer(Modifier.weight(1f))
+                            IconButton(onClick = actions.onRefresh, enabled = !state.isRefreshing) {
+                                Icon(Icons.Filled.Refresh, contentDescription = stringResource(R.string.action_refresh))
+                            }
                         }
-                        if (state.mapStatus == MapStatus.AVAILABLE) {
-                            ViewModeToggle(state.viewMode, actions.onViewModeChange)
+                        FilterRow(
+                            filters = state.filters,
+                            onToggleOpen = actions.onToggleOpen,
+                            onToggleAvailable = actions.onToggleAvailable,
+                            onToggleFavorites = actions.onToggleFavorites,
+                            modifier = Modifier.padding(top = 4.dp),
+                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxWidth().padding(end = 8.dp),
+                        ) {
+                            if (hasContent) {
+                                Text(
+                                    pluralStringResource(R.plurals.result_count, state.totalCount, state.items.size, state.totalCount),
+                                    style = MaterialTheme.typography.labelLarge,
+                                    modifier = Modifier.weight(1f),
+                                )
+                            } else {
+                                Spacer(Modifier.weight(1f))
+                            }
+                            if (showsViewModeToggle(width, state.mapStatus)) {
+                                ViewModeToggle(state.viewMode, actions.onViewModeChange)
+                            }
                         }
                     }
                 }
-            }
-            // Network activity never replaces existing content with a full-screen loader.
-            if (state.isRefreshing && hasContent) LinearProgressIndicator(Modifier.fillMaxWidth())
-            FreshnessBanner(sync = state.sync, isRefreshing = state.isRefreshing, hasContent = hasContent)
-            LocationMessage(
-                status = state.location,
-                onOpenAppSettings = actions.onOpenAppSettings,
-                onOpenLocationSettings = actions.onOpenLocationSettings,
-                onRetry = actions.onLocate,
-                onDismiss = actions.onDismissLocationMessage,
-            )
-            if (hasContent) ReferenceRow(state.reference, actions.onClearDestination)
+                // Network activity never replaces existing content with a full-screen loader.
+                if (state.isRefreshing && hasContent) LinearProgressIndicator(Modifier.fillMaxWidth())
+                FreshnessBanner(sync = state.sync, isRefreshing = state.isRefreshing, hasContent = hasContent)
+                LocationMessage(
+                    status = state.location,
+                    onOpenAppSettings = actions.onOpenAppSettings,
+                    onOpenLocationSettings = actions.onOpenLocationSettings,
+                    onRetry = actions.onLocate,
+                    onDismiss = actions.onDismissLocationMessage,
+                )
+                if (hasContent) ReferenceRow(state.reference, actions.onClearDestination)
 
-            val content = state.content
-            val showMap = state.viewMode == ViewMode.MAP && state.mapStatus == MapStatus.AVAILABLE && content == ListContent.Items
-            when {
-                showMap -> ParkMapPane(
-                    state = state,
-                    onSelectPark = actions.onSelectPark,
-                    onSetDestination = actions.onSetDestination,
-                    onOpenDetail = actions.onOpenDetail,
-                    onDirections = actions.onDirections,
-                    modifier = Modifier.weight(1f),
-                )
-                content == ListContent.Items -> ParkList(
-                    items = state.items,
-                    orphanFavorites = state.orphanFavorites,
-                    showOrphans = state.filters.favoritesOnly,
-                    selectedParkId = state.selectedParkId,
-                    isRefreshing = state.isRefreshing,
-                    canShowOnMap = state.mapStatus == MapStatus.AVAILABLE,
-                    scrollResetKey = state.query to state.filters,
-                    onRefresh = actions.onRefresh,
-                    onOpenDetail = actions.onOpenDetail,
-                    onShowOnMap = actions.onShowOnMap,
-                    onToggleFavorite = actions.onToggleFavorite,
-                    modifier = Modifier.weight(1f),
-                )
-                else -> ListContentState(
-                    content = content,
-                    filtersActive = state.filters.isAnyActive,
-                    onRetry = actions.onRefresh,
-                    onClearQuery = actions.onClearQuery,
-                    onClearFilters = actions.onClearFilters,
-                    modifier = Modifier.weight(1f),
-                )
+                val content = state.content
+                val list: @Composable (Modifier) -> Unit = { modifier ->
+                    ParkList(
+                        items = state.items,
+                        orphanFavorites = state.orphanFavorites,
+                        showOrphans = state.filters.favoritesOnly,
+                        selectedParkId = state.selectedParkId,
+                        isRefreshing = state.isRefreshing,
+                        canShowOnMap = state.mapStatus == MapStatus.AVAILABLE,
+                        scrollResetKey = state.query to state.filters,
+                        onRefresh = actions.onRefresh,
+                        onOpenDetail = actions.onOpenDetail,
+                        onShowOnMap = actions.onShowOnMap,
+                        onToggleFavorite = actions.onToggleFavorite,
+                        modifier = modifier,
+                    )
+                }
+                when (resultLayout(width, state.mapStatus, state.viewMode, content)) {
+                    ResultLayout.LIST_AND_MAP -> Row(Modifier.weight(1f).fillMaxWidth()) {
+                        list(Modifier.width(listPaneWidth(width)).fillMaxHeight())
+                        VerticalDivider()
+                        mapPane(Modifier.weight(1f).fillMaxHeight())
+                    }
+                    ResultLayout.MAP -> mapPane(Modifier.weight(1f))
+                    ResultLayout.LIST -> list(Modifier.weight(1f))
+                    ResultLayout.MESSAGE -> ListContentState(
+                        content = content,
+                        filtersActive = state.filters.isAnyActive,
+                        onRetry = actions.onRefresh,
+                        onClearQuery = actions.onClearQuery,
+                        onClearFilters = actions.onClearFilters,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
             }
         }
     }

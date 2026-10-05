@@ -9,24 +9,25 @@
 ## P2 — Ürün
 3. **Adres/yer araması** (hedefi adla seçmek). Places/Geocoding API ücretli. Maliyet ve
    hesap kararı gerektiriyor.
-4. **Tablet ve yatay ekran için iki bölmeli düzen** (liste ve harita yan yana).
-5. **Uygulama içi dil seçimi.** Bugün sistemin uygulama başına dil ayarı destekleniyor
+4. **Uygulama içi dil seçimi.** Bugün sistemin uygulama başına dil ayarı destekleniyor
    (`generateLocaleConfig`).
-6. **Harita erişilebilirliği.** TalkBack ile işaretlere gezinme. Bugün liste görünümü
+5. **Harita erişilebilirliği.** TalkBack ile işaretlere gezinme. Bugün liste görünümü
    erişilebilir alternatif.
-7. **Paylaşım.** Otopark konumunu bağlantı olarak paylaşmak.
+6. **Paylaşım.** Otopark konumunu bağlantı olarak paylaşmak.
 
 ## P3 — Mühendislik
-8. **Bağımlılık güncellemeleri.** `maps-compose` 9.x (çıkışı 2026-10-01),
+7. **Bağımlılık güncellemeleri.** `maps-compose` 9.x (çıkışı 2026-10-01),
     `play-services-location` 21.4.x (bu ortamdan Google Maven'a erişilemediği için
     doğrulanamadı).
-9. **Baseline profile ve açılış performansı ölçümü.**
-10. **Ekran görüntüsü (screenshot) testleri.** Açık/koyu tema ve büyük yazı.
-11. **Release imzalama CI'ı.** İmza anahtarı GitHub secrets'ta, AAB üretimi. Mağazaya
+8. **Baseline profile ve açılış performansı ölçümü.**
+9. **Ekran görüntüsü (screenshot) testleri.** Açık/koyu tema ve büyük yazı.
+10. **Release imzalama CI'ı.** İmza anahtarı GitHub secrets'ta, AAB üretimi. Mağazaya
     yükleme yok.
-12. **Ekran sayısı artarsa modüllere ayırma** (`:core:data`, `:feature:map` vb.).
+11. **Ekran sayısı artarsa modüllere ayırma** (`:core:data`, `:feature:map` vb.).
 
 ## Tamamlananlar
+- **Tablet ve geniş yatay ekran düzeni** (eski P2 #4). 840 dp ve üstünde liste ve harita yan
+  yana, detay içeriği okunabilir genişlikte ([ARCHITECTURE.md](ARCHITECTURE.md#ekran-durumu)).
 - **Alan poligonları** (eski P1 #2). Seçili otoparkın alanı haritada çiziliyor. WKT sırası
   hiç değiştirilmiyor, alan yalnızca otoparkın kendi konumunun çevresindeyse gösteriliyor
   ([ADR-0012](adr/0012-alan-poligonlari.md)).

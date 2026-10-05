@@ -58,7 +58,9 @@ yeniden deneme (`ReconnectionsTest`, `ListRefreshTriggersTest`,
 `ConnectivityNetworkMonitorTest`, `DetailViewModelTest`,
 `MainFlowTest.detailLoadsByItselfWhenTheConnectionComesBack`), alan poligonu: WKT sırası,
 yer değiştirmeme ve otoparkın konumuna yakınlık (`AreaPolygonParserTest`), seçili alanın
-haritaya gelmesi ve haritada seçimde eksik detayın bir kez indirilmesi (`MainViewModelTest`).
+haritaya gelmesi ve haritada seçimde eksik detayın bir kez indirilmesi (`MainViewModelTest`),
+telefon ve tablet düzenleri (`ResultLayoutTest`, `AdaptiveLayoutTest`: Robolectric Google
+haritası çizemediği için harita yuvasına yer tutucu konuyor).
 
 ## İlkeler
 
