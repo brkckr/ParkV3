@@ -50,6 +50,9 @@ jobs:
           arch: x86_64
           target: google_apis
           profile: pixel_6
+          # The default data partition is too small for the Android 17 image to install the
+          # app ("Requested internal only, but not enough space").
+          disk-size: 8G
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           # The action runs each line on its own.

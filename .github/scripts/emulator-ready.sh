@@ -20,3 +20,6 @@ if ! output=$(adb install -r -t "$apk" 2>&1); then
   exit 1
 fi
 echo "$output"
+# Gradle installs its own build next, which can be signed with a different debug key; a copy
+# left here would block it (INSTALL_FAILED_UPDATE_INCOMPATIBLE).
+adb uninstall com.brkckr.parkv3
