@@ -14,9 +14,9 @@
    çizicisini özelleştirmek gerekiyor. Ayrıca TalkBack ile gerçek cihazda deneme.
 
 ## P3 — Mühendislik
-5. **Bağımlılık güncellemeleri.** `maps-compose` 9.x (çıkışı 2026-10-01),
-    `play-services-location` 21.4.x (bu ortamdan Google Maven'a erişilemediği için
-    doğrulanamadı).
+5. **Kalan bağımlılık güncellemeleri.** Gradle 9.8.0 (sağlama toplamı bu ortamdan
+   alınamadı) ve Google Maven'daki kütüphaneler (`play-services-location`, AndroidX, AGP).
+   Google Maven'a erişebilen bir ortamda kontrol edilmeli.
 6. **Baseline profile ve açılış performansı ölçümü.**
 7. **Ekran görüntüsü (screenshot) testleri.** Açık/koyu tema ve büyük yazı.
 8. **Release imzalama CI'ı.** İmza anahtarı GitHub secrets'ta, AAB üretimi. Mağazaya
@@ -24,6 +24,8 @@
 9. **Ekran sayısı artarsa modüllere ayırma** (`:core:data`, `:feature:map` vb.).
 
 ## Tamamlananlar
+- **Bağımlılık güncellemeleri, Maven Central kısmı.** Kotlin 2.4.20, maps-compose 9.0.0. Diğer
+  Maven Central bağımlılıkları zaten günceldi ([ADR-0011](adr/0011-surum-secimi.md)).
 - **Harita işaretlerinin ekran okuyucu metni** (eski P2 harita erişilebilirliği maddesinin
   ilk kısmı). İşaret adı (adsız otoparkta yedek ad) ve "durum · doluluk" açıklaması, listedeki
   metinlerle aynı.
