@@ -3,6 +3,8 @@ package com.brkckr.parkv3.ui.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.brkckr.parkv3.connectivity.NetworkMonitor
+import com.brkckr.parkv3.connectivity.reconnections
 import com.brkckr.parkv3.domain.ParkRepository
 import com.brkckr.parkv3.domain.model.Availability
 import com.brkckr.parkv3.domain.model.Clock
@@ -86,6 +88,7 @@ data class DetailUiState(
 class DetailViewModel @Inject constructor(
     private val repository: ParkRepository,
     private val clock: Clock,
+    private val networkMonitor: NetworkMonitor,
     mapAvailability: MapAvailability,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -119,12 +122,27 @@ class DetailViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), DetailUiState(parkId))
 
     private var refreshJob: Job? = null
+    private var reconnectJob: Job? = null
 
     /**
      * Called each time the screen starts (first open and every return to the foreground);
-     * the single trigger avoids racing duplicate requests on open.
+     * the single trigger avoids racing duplicate requests on open. Until [onBackground], a
+     * request that failed for lack of network is retried when the connection comes back.
      */
-    fun onForeground() = refreshIfStale()
+    fun onForeground() {
+        refreshIfStale()
+        reconnectJob?.cancel()
+        reconnectJob = viewModelScope.launch {
+            networkMonitor.isOnline.reconnections().collect {
+                if (lastError.value == RefreshError.Network) refresh() else refreshIfStale()
+            }
+        }
+    }
+
+    fun onBackground() {
+        reconnectJob?.cancel()
+        reconnectJob = null
+    }
 
     fun onRetry() = refresh()
 

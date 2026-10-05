@@ -78,7 +78,7 @@ fun DetailRoute(
     val snackbarHostState = remember { SnackbarHostState() }
     LifecycleStartEffect(viewModel) {
         viewModel.onForeground()
-        onStopOrDispose { }
+        onStopOrDispose { viewModel.onBackground() }
     }
     DetailScreen(
         state = state,

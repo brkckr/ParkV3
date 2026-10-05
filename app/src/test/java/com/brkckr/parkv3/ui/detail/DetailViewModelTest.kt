@@ -9,6 +9,7 @@ import com.brkckr.parkv3.domain.model.ParkDetail
 import com.brkckr.parkv3.domain.model.RefreshError
 import com.brkckr.parkv3.domain.model.RefreshResult
 import com.brkckr.parkv3.domain.model.SyncInfo
+import com.brkckr.parkv3.testutil.FakeNetworkMonitor
 import com.brkckr.parkv3.testutil.FakeParkRepository
 import com.brkckr.parkv3.testutil.MainDispatcherRule
 import com.brkckr.parkv3.testutil.MutableClock
@@ -30,6 +31,7 @@ class DetailViewModelTest {
 
     private val repository = FakeParkRepository()
     private val clock = MutableClock(now = 1_800_000_000_000L)
+    private val network = FakeNetworkMonitor()
 
     private fun detail(parkId: Int = 7, fetchedAt: Long = clock.now, capacity: Int? = 100, empty: Int? = 40) = ParkDetail(
         parkId = parkId,
@@ -49,7 +51,7 @@ class DetailViewModelTest {
     )
 
     private fun viewModel(parkId: Int = 7) =
-        DetailViewModel(repository, clock, MapAvailability { MapStatus.NO_API_KEY }, SavedStateHandle(mapOf(DetailViewModel.ARG_PARK_ID to parkId)))
+        DetailViewModel(repository, clock, network, MapAvailability { MapStatus.NO_API_KEY }, SavedStateHandle(mapOf(DetailViewModel.ARG_PARK_ID to parkId)))
 
     private fun TestScope.collect(vm: DetailViewModel) {
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
@@ -170,5 +172,51 @@ class DetailViewModelTest {
 
         assertThat(vm.uiState.value.park).isNotNull()
         assertThat(vm.uiState.value.isListed).isFalse()
+    }
+
+    @Test
+    fun `a detail that failed for lack of network loads when the connection comes back`() = runTest {
+        network.online.value = false
+        repository.detailResults += RefreshResult.Failure(RefreshError.Network) to null
+        repository.detailResults += RefreshResult.Success() to detail()
+        val vm = viewModel()
+        collect(vm)
+        vm.onForeground()
+        assertThat(vm.uiState.value.content).isEqualTo(DetailContent.Error(RefreshError.Network))
+
+        network.online.value = true
+
+        assertThat(vm.uiState.value.content).isEqualTo(DetailContent.Full)
+        assertThat(repository.detailRefreshCalls).isEqualTo(2)
+    }
+
+    @Test
+    fun `a server error is not retried on reconnect while the cached detail is fresh`() = runTest {
+        repository.details.value = mapOf(7 to detail(fetchedAt = clock.now))
+        repository.detailResults += RefreshResult.Failure(RefreshError.Http(503)) to null
+        val vm = viewModel()
+        collect(vm)
+        vm.onForeground()
+        vm.onRetry()
+        assertThat(vm.uiState.value.error).isEqualTo(RefreshError.Http(503))
+
+        network.online.value = false
+        network.online.value = true
+
+        assertThat(repository.detailRefreshCalls).isEqualTo(1)
+    }
+
+    @Test
+    fun `a stopped screen does not retry when the connection comes back`() = runTest {
+        network.online.value = false
+        repository.detailResults += RefreshResult.Failure(RefreshError.Network) to null
+        val vm = viewModel()
+        collect(vm)
+        vm.onForeground()
+        vm.onBackground()
+
+        network.online.value = true
+
+        assertThat(repository.detailRefreshCalls).isEqualTo(1)
     }
 }

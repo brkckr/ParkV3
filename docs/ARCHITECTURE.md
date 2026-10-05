@@ -11,9 +11,11 @@ com.brkckr.parkv3
 │   └── ParkRepository Arayüz (observe* + refresh*)
 ├── data/
 │   ├── remote/        Retrofit API (JsonElement), tip toleranslı ayrıştırıcı, uzak kaynak
-│   ├── sync/          ListSyncPolicy: yanıt kabul/ret ve küçülme koruması
+│   ├── sync/          ListSyncPolicy: yanıt kabul/ret ve küçülme koruması.
+│   │                  ListRefreshTriggers: ön plana gelişte ve yeniden bağlanınca yenileme
 │   ├── local/         Room varlıkları, DAO (tek transaction'lı senkron), eşleyiciler
 │   └── OfflineFirstParkRepository  Single-flight yenileme, iptal semantiği
+├── connectivity/      NetworkMonitor (doğrulanmış internet bağlantısı), yeniden bağlanma akışı
 ├── location/          FusedLocationProvider (yalnızca güncel konum)
 ├── navigation/        Tip güvenli rotalar, harici yol tarifi zinciri
 ├── ui/
@@ -42,7 +44,9 @@ com.brkckr.parkv3
   HTTP kodu gösteriyor, sunucu gövdesi hiçbir zaman okunmuyor.
 - **Tazelik**: `sync_state.lastSuccessAt` yalnızca başarılı senkronda ilerliyor. Liste,
   ön plana gelişte (`ProcessLifecycleOwner`) ve soğuk açılışta 5 dakikadan eskiyse
-  yenileniyor. Detay, ekran her START olduğunda 5 dakikadan eskiyse yenileniyor.
+  yenileniyor. Detay, ekran her START olduğunda 5 dakikadan eskiyse yenileniyor. Bağlantı
+  geri geldiğinde ağ hatasıyla biten istekler yeniden deneniyor
+  ([ADR-0005](adr/0005-tazelik.md)).
 - **Kayıp kayıt politikası**: Tam ve geçerli yanıtta olmayan parklar silinmiyor,
   `missingSince` ile işaretleniyor. 30 gün sonra siliniyor. Favoriler etkilenmiyor
   ([ADR-0004](adr/0004-liste-senkron-politikasi.md)).

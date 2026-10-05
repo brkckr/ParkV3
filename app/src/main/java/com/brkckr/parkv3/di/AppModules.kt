@@ -2,6 +2,8 @@ package com.brkckr.parkv3.di
 
 import android.content.Context
 import com.brkckr.parkv3.BuildConfig
+import com.brkckr.parkv3.connectivity.ConnectivityNetworkMonitor
+import com.brkckr.parkv3.connectivity.NetworkMonitor
 import com.brkckr.parkv3.data.OfflineFirstParkRepository
 import com.brkckr.parkv3.data.local.ParkDao
 import com.brkckr.parkv3.data.local.ParkDatabase
@@ -105,4 +107,7 @@ interface PlatformModule {
 
     @Binds
     fun bindMapAvailability(impl: PlayServicesMapAvailability): MapAvailability
+
+    @Binds
+    fun bindNetworkMonitor(impl: ConnectivityNetworkMonitor): NetworkMonitor
 }

@@ -2,6 +2,7 @@ package com.brkckr.parkv3.testutil
 
 import android.content.Context
 import androidx.room.Room
+import com.brkckr.parkv3.connectivity.NetworkMonitor
 import com.brkckr.parkv3.data.local.ParkDao
 import com.brkckr.parkv3.data.local.ParkDatabase
 import com.brkckr.parkv3.di.BaseUrlModule
@@ -18,6 +19,8 @@ import dagger.hilt.components.SingletonComponent
 import dagger.hilt.InstallIn
 import dagger.hilt.testing.TestInstallIn
 import dagger.multibindings.IntoSet
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import okhttp3.Interceptor
 import java.io.IOException
 import javax.inject.Singleton
@@ -53,12 +56,25 @@ object TestPlatformModule {
 
     @Provides
     fun provideMapAvailability(): MapAvailability = MapAvailability { MapStatus.NO_API_KEY }
+
+    @Provides
+    fun provideNetworkMonitor(): NetworkMonitor = object : NetworkMonitor {
+        override val isOnline: Flow<Boolean> = FakeConnectivity.online
+    }
 }
 
-/** Switch for simulating "no internet": requests fail with an IOException before leaving. */
+/**
+ * Switch for simulating "no internet": requests fail with an IOException before leaving, and
+ * the app's NetworkMonitor sees the change as it would on a device.
+ */
 object FakeConnectivity {
-    @Volatile
-    var offline: Boolean = false
+    val online = MutableStateFlow(true)
+
+    var offline: Boolean
+        get() = !online.value
+        set(value) {
+            online.value = !value
+        }
 }
 
 @Module
