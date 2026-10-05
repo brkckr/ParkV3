@@ -1,41 +1,32 @@
 package com.brkckr.parkv3.domain
 
 import com.brkckr.parkv3.domain.model.GeoPoint
-import com.brkckr.parkv3.domain.model.OpenState
 import com.brkckr.parkv3.testutil.park
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 class ParkListQueryTest {
 
-    private val openAvailable = park(1, name = "Kadıköy Rıhtım", district = "KADIKÖY", emptyCapacity = 12)
-    private val openFull = park(2, name = "Moda Sahil", district = "KADIKÖY", emptyCapacity = 0)
-    private val closed = park(3, name = "Şişli Merkez", district = "ŞİŞLİ", openState = OpenState.CLOSED)
-    private val unknownWithSpace = park(4, name = "İstinye Yolu", district = "SARIYER", openState = OpenState.UNKNOWN)
-    private val openInconsistent = park(5, name = "Üsküdar Meydan", district = "ÜSKÜDAR", capacity = 10, emptyCapacity = 50)
-    private val all = listOf(openAvailable, openFull, closed, unknownWithSpace, openInconsistent)
+    private val available = park(1, name = "Kadıköy Rıhtım", district = "KADIKÖY", emptyCapacity = 12)
+    private val full = park(2, name = "Moda Sahil", district = "KADIKÖY", emptyCapacity = 0)
+    private val missingOccupancy = park(3, name = "Şişli Merkez", district = "ŞİŞLİ", capacity = null, emptyCapacity = null)
+    private val spaceWithoutCapacity = park(4, name = "İstinye Yolu", district = "SARIYER", capacity = null, emptyCapacity = 30)
+    private val inconsistent = park(5, name = "Üsküdar Meydan", district = "ÜSKÜDAR", capacity = 10, emptyCapacity = 50)
+    private val all = listOf(available, full, missingOccupancy, spaceWithoutCapacity, inconsistent)
 
     private fun ids(query: String = "", filters: ParkFilters = ParkFilters(), favorites: Set<Int> = emptySet()) =
         ParkListQuery.apply(all, favorites, query, filters, reference = null).map { it.park.id }
 
     @Test
-    fun `open filter keeps only explicitly open parks`() {
-        assertThat(ids(filters = ParkFilters(openOnly = true))).containsExactly(1, 2, 5)
-    }
-
-    @Test
-    fun `available filter needs open state and consistent free spaces`() {
+    fun `available filter needs consistent free spaces`() {
         assertThat(ids(filters = ParkFilters(availableOnly = true))).containsExactly(1)
     }
 
     @Test
     fun `filters combine with AND`() {
         val favorites = setOf(2, 3, 1)
-        assertThat(ids(filters = ParkFilters(openOnly = true, favoritesOnly = true), favorites = favorites))
-            .containsExactly(1, 2)
-        assertThat(
-            ids(filters = ParkFilters(openOnly = true, availableOnly = true, favoritesOnly = true), favorites = setOf(2, 3)),
-        ).isEmpty()
+        assertThat(ids(filters = ParkFilters(favoritesOnly = true), favorites = favorites)).containsExactly(1, 2, 3)
+        assertThat(ids(filters = ParkFilters(availableOnly = true, favoritesOnly = true), favorites = setOf(2, 3))).isEmpty()
         assertThat(ids(query = "kadıköy", filters = ParkFilters(availableOnly = true, favoritesOnly = true), favorites = favorites))
             .containsExactly(1)
     }

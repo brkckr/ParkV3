@@ -202,7 +202,7 @@ private fun DetailBody(
     onShowOnMap: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
-    val now = rememberNow(state.detail?.fetchedAtMillis, state.listUpdatedAtMillis)
+    val now = rememberNow(state.detail?.fetchedAtMillis)
     val detail = state.detail
     Column(
         modifier
@@ -246,13 +246,6 @@ private fun DetailBody(
                 ) {
                     StatusBadge(state.availability)
                     Text(occupancyText(state.occupancy, state.capacity), style = MaterialTheme.typography.bodyLarge)
-                }
-                state.listUpdatedAtMillis?.let {
-                    Text(
-                        stringResource(R.string.detail_status_source, timeWithRelative(it, now)),
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(top = 4.dp),
-                    )
                 }
             }
 

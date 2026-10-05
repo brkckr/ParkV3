@@ -29,7 +29,7 @@ Kimlik doğrulama gerekmiyor (açık veri, CC BY 4.0). Hız sınırı belgelenme
 | `lat`, `lng` | **string** | `"41.0563"`, `"28.9941"` | WGS84 ondalık derece | Metin veya sayı. Sonlu değilse, (0,0) ise veya İstanbul kutusu (enlem 40.5–41.9, boylam 27.5–30.0) dışındaysa geçersiz. Ölçümde 246/246 kutu içindeydi. Yer değiştirme **yapılmaz** |
 | `capacity` | int | `65` | Toplam kapasite | Eksik → bilinmiyor. `≤ 0` → tutarsız (ölçümde yok) |
 | `emptyCapacity` | int | `0` | Anlık boş yer | Eksik → bilinmiyor. `< 0` veya `> capacity` → tutarsız (ölçümde yok) |
-| `isOpen` | int | `0` (169), `1` (77) | Kaynağın açık/kapalı bildirimi | `1/true` → açık, `0/false` → kapalı, diğer her şey → bilinmiyor. **Not:** `workHours = "24 Saat"` olan en az 63 kayıt ölçüm anında `isOpen = 0` idi. Alanın anlamı (işletme kapalı mı, yoksa canlı veri mi yok) doğrulanamadı. UI "Kapalı (kaynağa göre)" diyor ve çalışma saatinden açıklık hesaplamıyor |
+| `isOpen` | int | `0` (169), `1` (77) | Belgelenmemiş | **Kullanılmıyor** ([ADR-0014](adr/0014-isopen-kullanilmiyor.md)). `workHours = "24 Saat"` olan en az 63 kayıt ölçüm anında `isOpen = 0` idi, anlamı doğrulanamadı. Ayrıştırıcı alanı atlıyor, sözleşme kontrolü denetlemiyor |
 | `workHours` | string | `"24 Saat"` (140), `"08:00-23:00"` | Çalışma saatleri, serbest metin | Ham gösterim |
 | `parkType` | string | `"AÇIK OTOPARK"` (110), `"KAPALI OTOPARK"` (86), `"YOL ÜSTÜ"` (50) | Tür | Ham gösterim |
 | `district` | string | `"FATİH"` | İlçe, büyük harf | Aramada kullanılır |
@@ -51,8 +51,9 @@ Kimlik doğrulama gerekmiyor (açık veri, CC BY 4.0). Hız sınırı belgelenme
 | `updateDate` | string **veya null** | `"05.10.2026 00:10:23"`, `null` | `dd.MM.yyyy HH:mm:ss`, Europe/Istanbul (ölçüm anı 21:12 UTC ile tutarlı). "Kaynak güncelleme zamanı" olarak ayrı gösterilir |
 | `areaPolygon` | string (WKT) | `"POLYGON ((29.0910 41.0251, 29.0920 41.0251, …))"` | Ölçülen örnekler WKT standardındaki X=boylam, Y=enlem sırasındaydı. Probe bunu her hafta değişen 20 kayıtlık bir örneklemde, poligonun kaydın kendi konumuna hangi sırada denk geldiğine bakarak kontrol ediyor. Ham saklanıyor. Haritada seçili otopark için çiziliyor, ancak her noktası geçerliyse ve otoparkın konumuna 2 km'den yakınsa. Eksenler hiç yer değiştirilmiyor ([ADR-0012](adr/0012-alan-poligonlari.md)) |
 
-Detayda **`isOpen`, `fee` ve `phone` yok.** Detay ekranı açık/kapalı bilgisini listedeki kayıttan alıyor
-ve kendi zaman damgasıyla gösteriyor.
+Detayda **`isOpen`, `fee` ve `phone` yok.** Uygulama açık/kapalı bilgisi göstermiyor
+([ADR-0014](adr/0014-isopen-kullanilmiyor.md)). Doluluk, liste ile detaydan hangisi daha
+yeni indiyse ondan alınıyor.
 
 ## Hata ve uç durumlar
 
@@ -86,7 +87,8 @@ bununla karşılaştırıyor.
 - `Park` HTTP 200 dışında bir kod (5xx hariç), dizi olmayan gövde ya da 123'ten az kayıt
   (ölçülen 246'nın yarısı, uygulamanın küçülme korumasıyla aynı mantık).
 - Kayıtların %5'inden fazlasında: bir alan eksik, tipi ölçülenden farklı, yeni bir alan var,
-  kullanılabilir `parkID` yok, koordinat İstanbul kutusu dışında, `isOpen` 0/1 dışında.
+  kullanılabilir `parkID` yok, koordinat İstanbul kutusu dışında. Uygulamanın okumadığı
+  `isOpen` bu kontrollerin dışında tutuluyor.
 - Detay: tek elemanlı dizi değil, istenen id'den farklı `parkID` (uygulama bunu "bulunamadı"
   sayar), uygulamanın okuyamadığı `updateDate`, enlem-boylam sırasında bir `areaPolygon`,
   WKT olmayan poligonlar.

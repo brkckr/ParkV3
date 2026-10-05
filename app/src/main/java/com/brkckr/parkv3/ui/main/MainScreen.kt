@@ -74,7 +74,6 @@ private val LOCATION_PERMISSIONS = arrayOf(Manifest.permission.ACCESS_FINE_LOCAT
 class MainActions(
     val onQueryChange: (String) -> Unit = {},
     val onClearQuery: () -> Unit = {},
-    val onToggleOpen: () -> Unit = {},
     val onToggleAvailable: () -> Unit = {},
     val onToggleFavorites: () -> Unit = {},
     val onClearFilters: () -> Unit = {},
@@ -168,7 +167,6 @@ fun MainRoute(
         MainActions(
             onQueryChange = viewModel::onQueryChange,
             onClearQuery = viewModel::onClearQuery,
-            onToggleOpen = viewModel::onToggleOpenFilter,
             onToggleAvailable = viewModel::onToggleAvailableFilter,
             onToggleFavorites = viewModel::onToggleFavoritesFilter,
             onClearFilters = viewModel::onClearFilters,
@@ -252,7 +250,6 @@ fun MainScreen(
                         }
                         FilterRow(
                             filters = state.filters,
-                            onToggleOpen = actions.onToggleOpen,
                             onToggleAvailable = actions.onToggleAvailable,
                             onToggleFavorites = actions.onToggleFavorites,
                             modifier = Modifier.padding(top = 4.dp),

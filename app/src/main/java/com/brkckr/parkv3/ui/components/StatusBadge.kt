@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -33,8 +31,6 @@ data class StatusStyle(val icon: ImageVector, val container: Color, val content:
 fun availabilityLabel(availability: Availability): Int = when (availability) {
     Availability.AVAILABLE -> R.string.status_available
     Availability.FULL -> R.string.status_full
-    Availability.CLOSED -> R.string.status_closed
-    Availability.OPEN_OCCUPANCY_UNKNOWN -> R.string.status_open_unknown_occupancy
     Availability.UNKNOWN -> R.string.status_unknown
 }
 
@@ -45,8 +41,6 @@ fun statusStyle(availability: Availability): StatusStyle {
     return when (availability) {
         Availability.AVAILABLE -> StatusStyle(Icons.Filled.CheckCircle, colors.availableContainer, colors.onAvailable, label)
         Availability.FULL -> StatusStyle(Icons.Filled.Block, colors.fullContainer, colors.onFull, label)
-        Availability.CLOSED -> StatusStyle(Icons.Filled.Lock, colors.closedContainer, colors.onClosed, label)
-        Availability.OPEN_OCCUPANCY_UNKNOWN -> StatusStyle(Icons.Filled.Info, colors.unknownContainer, colors.onUnknown, label)
         Availability.UNKNOWN -> StatusStyle(Icons.Filled.QuestionMark, colors.unknownContainer, colors.onUnknown, label)
     }
 }

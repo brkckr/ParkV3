@@ -4,14 +4,14 @@ package com.brkckr.parkv3.domain.model
  * A parking lot as last reported by the İSPARK list endpoint.
  *
  * Every source field is nullable on purpose: a missing value is never the same thing as 0
- * or an empty string (see docs/adr/0003).
+ * or an empty string (see docs/adr/0003). The source's `isOpen` is not read at all: its
+ * meaning is undocumented and contradicts the published hours (docs/adr/0014).
  */
 data class Park(
     val id: Int,
     val name: String?,
     val district: String?,
     val location: GeoPoint?,
-    val openState: OpenState,
     val capacity: Int?,
     val emptyCapacity: Int?,
     val workHours: String?,
@@ -20,7 +20,7 @@ data class Park(
     val freeTime: Int?,
 ) {
     val occupancy: Occupancy get() = Occupancy.of(capacity, emptyCapacity)
-    val availability: Availability get() = Availability.of(openState, occupancy)
+    val availability: Availability get() = Availability.of(occupancy)
 }
 
 /** WGS84 point. Only constructed through [validOrNull] when coming from the source. */
@@ -41,8 +41,6 @@ data class GeoPoint(val latitude: Double, val longitude: Double) {
         }
     }
 }
-
-enum class OpenState { OPEN, CLOSED, UNKNOWN }
 
 sealed interface Occupancy {
     /** Both values present and consistent: capacity > 0 and 0 <= empty <= capacity. */
@@ -65,21 +63,17 @@ sealed interface Occupancy {
     }
 }
 
+/** What can be said about free spaces; based on occupancy only (docs/adr/0014). */
 enum class Availability {
     AVAILABLE,
     FULL,
-    CLOSED,
-    OPEN_OCCUPANCY_UNKNOWN,
+    /** Occupancy missing or inconsistent; never shown as free or full. */
     UNKNOWN;
 
     companion object {
-        fun of(openState: OpenState, occupancy: Occupancy): Availability = when (openState) {
-            OpenState.CLOSED -> CLOSED
-            OpenState.UNKNOWN -> UNKNOWN
-            OpenState.OPEN -> when (occupancy) {
-                is Occupancy.Known -> if (occupancy.empty > 0) AVAILABLE else FULL
-                else -> OPEN_OCCUPANCY_UNKNOWN
-            }
+        fun of(occupancy: Occupancy): Availability = when (occupancy) {
+            is Occupancy.Known -> if (occupancy.empty > 0) AVAILABLE else FULL
+            else -> UNKNOWN
         }
     }
 }

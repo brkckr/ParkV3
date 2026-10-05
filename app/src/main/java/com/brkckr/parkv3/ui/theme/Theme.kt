@@ -41,8 +41,6 @@ data class StatusColors(
     val onAvailable: Color,
     val fullContainer: Color,
     val onFull: Color,
-    val closedContainer: Color,
-    val onClosed: Color,
     val unknownContainer: Color,
     val onUnknown: Color,
 )
@@ -50,14 +48,12 @@ data class StatusColors(
 private val LightStatus = StatusColors(
     availableContainer = Color(0xFFC8F0D2), onAvailable = Color(0xFF0B3D1C),
     fullContainer = Color(0xFFFFDAD6), onFull = Color(0xFF5F0A0A),
-    closedContainer = Color(0xFFE1E2E8), onClosed = Color(0xFF2E3138),
     unknownContainer = Color(0xFFFFE8B3), onUnknown = Color(0xFF3F2E00),
 )
 
 private val DarkStatus = StatusColors(
     availableContainer = Color(0xFF1C5130), onAvailable = Color(0xFFC8F0D2),
     fullContainer = Color(0xFF7A1F1A), onFull = Color(0xFFFFDAD6),
-    closedContainer = Color(0xFF44474E), onClosed = Color(0xFFE1E2E8),
     unknownContainer = Color(0xFF5B4300), onUnknown = Color(0xFFFFE8B3),
 )
 

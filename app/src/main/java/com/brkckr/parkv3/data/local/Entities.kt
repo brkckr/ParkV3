@@ -3,7 +3,6 @@ package com.brkckr.parkv3.data.local
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.brkckr.parkv3.domain.model.OpenState
 
 /**
  * Last list snapshot. [lastSeenSyncId] is the generation of the last accepted response that
@@ -18,7 +17,6 @@ data class ParkEntity(
     val district: String?,
     val latitude: Double?,
     val longitude: Double?,
-    val openState: OpenState,
     val capacity: Int?,
     val emptyCapacity: Int?,
     val workHours: String?,

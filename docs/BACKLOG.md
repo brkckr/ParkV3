@@ -1,28 +1,29 @@
 # İkinci Sürüm Backlog'u (öncelik sırasıyla)
 
 ## P1 — Veri doğruluğu ve güvenilirlik
-1. **`isOpen` anlamını İBB ile netleştirmek.** Ölçümde "24 Saat" çalışan en az 63 otopark
-   `isOpen = 0` geldi. Bu alan "işletme kapalı" mı, "canlı veri yok" mu demek? Cevaba göre
-   etiket ve "Açık" filtresi güncellenecek.
-2. **targetSdk 37.** Android 17 davranış değişiklikleri cihazda test edildikten sonra.
+1. **targetSdk 37.** Android 17 davranış değişiklikleri cihazda test edildikten sonra.
 
 ## P2 — Ürün
-3. **Adres/yer araması** (hedefi adla seçmek). Places/Geocoding API ücretli. Maliyet ve
+2. **Adres/yer araması** (hedefi adla seçmek). Places/Geocoding API ücretli. Maliyet ve
    hesap kararı gerektiriyor.
-4. **Harita küme balonlarının erişilebilirliği.** İşaretler ekran okuyucuya ad, durum ve
+3. **Harita küme balonlarının erişilebilirliği.** İşaretler ekran okuyucuya ad, durum ve
    doluluk veriyor. Küme balonlarının (birden çok otopark) etiketi yok. maps-compose'un küme
    çizicisini özelleştirmek gerekiyor. Ayrıca TalkBack ile gerçek cihazda deneme.
 
 ## P3 — Mühendislik
-5. **Kalan bağımlılık güncellemeleri.** Gradle 9.8.0 (sağlama toplamı bu ortamdan
+4. **Kalan bağımlılık güncellemeleri.** Gradle 9.8.0 (sağlama toplamı bu ortamdan
    alınamadı) ve Google Maven'daki kütüphaneler (`play-services-location`, AndroidX, AGP).
    Google Maven'a erişebilen bir ortamda kontrol edilmeli.
-6. **Baseline profile ve açılış performansı ölçümü.**
-7. **Release imzalama CI'ı.** İmza anahtarı GitHub secrets'ta, AAB üretimi. Mağazaya
-    yükleme yok.
-8. **Ekran sayısı artarsa modüllere ayırma** (`:core:data`, `:feature:map` vb.).
+5. **Baseline profile ve açılış performansı ölçümü.**
+6. **Release imzalama CI'ı.** İmza anahtarı GitHub secrets'ta, AAB üretimi. Mağazaya
+   yükleme yok.
+7. **Ekran sayısı artarsa modüllere ayırma** (`:core:data`, `:feature:map` vb.).
 
 ## Tamamlananlar
+- **`isOpen` belirsizliği** (eski P1 #1). İBB'den açıklama beklenmeden kapatıldı: alan artık
+  okunmuyor. "Açık" filtresi ve "Kapalı" etiketi kaldırıldı, uygunluk yalnızca dolulukla
+  belirleniyor. Veritabanı sürüm 2, favoriler korunuyor
+  ([ADR-0014](adr/0014-isopen-kullanilmiyor.md)).
 - **Ekran görüntüsü testleri** (eski P3). Roborazzi ile ana liste (açık, koyu, Türkçe + büyük
   yazı), çevrimdışı durum, detay ve tablet düzeni. PR'larda son `main` ile karşılaştırma
   ([TESTING.md](TESTING.md#ekran-görüntüsü-testleri)).

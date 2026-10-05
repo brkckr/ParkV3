@@ -2,9 +2,9 @@ package com.brkckr.parkv3.ui.main
 
 import androidx.lifecycle.SavedStateHandle
 import com.brkckr.parkv3.domain.model.AreaPolygon
+import com.brkckr.parkv3.domain.model.Availability
 import com.brkckr.parkv3.domain.model.FreshnessPolicy
 import com.brkckr.parkv3.domain.model.GeoPoint
-import com.brkckr.parkv3.domain.model.OpenState
 import com.brkckr.parkv3.domain.model.ParkDetail
 import com.brkckr.parkv3.domain.model.RefreshError
 import com.brkckr.parkv3.domain.model.RefreshResult
@@ -43,8 +43,8 @@ class MainViewModelTest {
     private val parks = listOf(
         park(1, name = "Kadıköy Rıhtım", district = "KADIKÖY", location = kadikoy, emptyCapacity = 30),
         park(2, name = "Moda Sahil", district = "KADIKÖY", location = GeoPoint(40.9810, 29.0260), emptyCapacity = 0),
-        park(3, name = "Şişli Merkez", district = "ŞİŞLİ", location = sisli, openState = OpenState.CLOSED),
-        park(4, name = "Beşiktaş Sahil", district = "BEŞİKTAŞ", location = GeoPoint(41.0422, 29.0083), openState = OpenState.UNKNOWN),
+        park(3, name = "Şişli Merkez", district = "ŞİŞLİ", location = sisli, capacity = null, emptyCapacity = null),
+        park(4, name = "Beşiktaş Sahil", district = "BEŞİKTAŞ", location = GeoPoint(41.0422, 29.0083), capacity = 10, emptyCapacity = 50),
         park(5, name = "Ümraniye Meydan", district = "ÜMRANİYE", location = null, emptyCapacity = 5),
     )
 
@@ -77,9 +77,6 @@ class MainViewModelTest {
         repository.favorites.value = setOf(1, 3, 5)
         val vm = viewModel()
         collect(vm)
-
-        vm.onToggleOpenFilter()
-        assertThat(vm.ids()).containsExactly(1, 2, 5)
 
         vm.onToggleAvailableFilter()
         assertThat(vm.ids()).containsExactly(1, 5)
@@ -252,7 +249,7 @@ class MainViewModelTest {
         assertThat(vm.uiState.value.content).isEqualTo(ListContent.NoSearchResults("zzz"))
 
         vm.onClearQuery()
-        repository.parks.value = parks.filter { it.openState != OpenState.OPEN }
+        repository.parks.value = parks.filter { it.availability != Availability.AVAILABLE }
         vm.onToggleAvailableFilter()
         assertThat(vm.uiState.value.content).isEqualTo(ListContent.NoFilterResults)
     }

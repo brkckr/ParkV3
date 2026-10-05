@@ -2,7 +2,6 @@ package com.brkckr.parkv3.domain
 
 import com.brkckr.parkv3.domain.model.Availability
 import com.brkckr.parkv3.domain.model.GeoPoint
-import com.brkckr.parkv3.domain.model.OpenState
 import com.brkckr.parkv3.domain.model.Park
 import java.text.Collator
 import java.text.Normalizer
@@ -15,11 +14,10 @@ import kotlin.math.sqrt
 
 /** Filters are combined with AND. */
 data class ParkFilters(
-    val openOnly: Boolean = false,
     val availableOnly: Boolean = false,
     val favoritesOnly: Boolean = false,
 ) {
-    val isAnyActive: Boolean get() = openOnly || availableOnly || favoritesOnly
+    val isAnyActive: Boolean get() = availableOnly || favoritesOnly
 }
 
 data class ParkListItem(
@@ -47,7 +45,6 @@ object ParkListQuery {
         val tokens = SearchText.tokens(query)
         val items = parks.asSequence()
             .filter { park -> SearchText.matches(tokens, park) }
-            .filter { park -> !filters.openOnly || park.openState == OpenState.OPEN }
             .filter { park -> !filters.availableOnly || park.availability == Availability.AVAILABLE }
             .filter { park -> !filters.favoritesOnly || park.id in favoriteIds }
             .map { park ->

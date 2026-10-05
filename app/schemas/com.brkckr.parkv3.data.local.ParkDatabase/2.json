@@ -1,0 +1,281 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "8c69c2d7808b1595343ab1d8342fd8d4",
+    "entities": [
+      {
+        "tableName": "parks",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT, `district` TEXT, `latitude` REAL, `longitude` REAL, `capacity` INTEGER, `emptyCapacity` INTEGER, `workHours` TEXT, `parkType` TEXT, `freeTime` INTEGER, `lastSeenSyncId` INTEGER NOT NULL, `lastSeenAtMillis` INTEGER NOT NULL, `missingSinceMillis` INTEGER, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "district",
+            "columnName": "district",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "latitude",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "longitude",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "capacity",
+            "columnName": "capacity",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "emptyCapacity",
+            "columnName": "emptyCapacity",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "workHours",
+            "columnName": "workHours",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "parkType",
+            "columnName": "parkType",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "freeTime",
+            "columnName": "freeTime",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "lastSeenSyncId",
+            "columnName": "lastSeenSyncId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastSeenAtMillis",
+            "columnName": "lastSeenAtMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "missingSinceMillis",
+            "columnName": "missingSinceMillis",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_parks_missingSinceMillis",
+            "unique": false,
+            "columnNames": [
+              "missingSinceMillis"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_parks_missingSinceMillis` ON `${TABLE_NAME}` (`missingSinceMillis`)"
+          }
+        ]
+      },
+      {
+        "tableName": "park_details",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`parkId` INTEGER NOT NULL, `name` TEXT, `district` TEXT, `address` TEXT, `parkType` TEXT, `workHours` TEXT, `latitude` REAL, `longitude` REAL, `capacity` INTEGER, `emptyCapacity` INTEGER, `freeTime` INTEGER, `monthlyFee` REAL, `tariffRaw` TEXT, `areaPolygonRaw` TEXT, `sourceUpdatedRaw` TEXT, `sourceUpdatedAtMillis` INTEGER, `fetchedAtMillis` INTEGER NOT NULL, PRIMARY KEY(`parkId`))",
+        "fields": [
+          {
+            "fieldPath": "parkId",
+            "columnName": "parkId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "district",
+            "columnName": "district",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "address",
+            "columnName": "address",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "parkType",
+            "columnName": "parkType",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "workHours",
+            "columnName": "workHours",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "latitude",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "longitude",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "capacity",
+            "columnName": "capacity",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "emptyCapacity",
+            "columnName": "emptyCapacity",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "freeTime",
+            "columnName": "freeTime",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "monthlyFee",
+            "columnName": "monthlyFee",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "tariffRaw",
+            "columnName": "tariffRaw",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "areaPolygonRaw",
+            "columnName": "areaPolygonRaw",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "sourceUpdatedRaw",
+            "columnName": "sourceUpdatedRaw",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "sourceUpdatedAtMillis",
+            "columnName": "sourceUpdatedAtMillis",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "fetchedAtMillis",
+            "columnName": "fetchedAtMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "parkId"
+          ]
+        }
+      },
+      {
+        "tableName": "favorites",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`parkId` INTEGER NOT NULL, `nameSnapshot` TEXT, `districtSnapshot` TEXT, `addedAtMillis` INTEGER NOT NULL, PRIMARY KEY(`parkId`))",
+        "fields": [
+          {
+            "fieldPath": "parkId",
+            "columnName": "parkId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nameSnapshot",
+            "columnName": "nameSnapshot",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "districtSnapshot",
+            "columnName": "districtSnapshot",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "addedAtMillis",
+            "columnName": "addedAtMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "parkId"
+          ]
+        }
+      },
+      {
+        "tableName": "sync_state",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `syncId` INTEGER NOT NULL, `lastSuccessAtMillis` INTEGER, `lastAttemptAtMillis` INTEGER, `lastErrorKind` TEXT, `lastErrorCode` INTEGER, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "syncId",
+            "columnName": "syncId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastSuccessAtMillis",
+            "columnName": "lastSuccessAtMillis",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "lastAttemptAtMillis",
+            "columnName": "lastAttemptAtMillis",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "lastErrorKind",
+            "columnName": "lastErrorKind",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "lastErrorCode",
+            "columnName": "lastErrorCode",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8c69c2d7808b1595343ab1d8342fd8d4')"
+    ]
+  }
+}

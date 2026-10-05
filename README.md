@@ -9,7 +9,7 @@ uygulaması (Kotlin, Jetpack Compose).
   doğrulamadan geçerse haritada çiziliyor
 - Otopark adı ve ilçe araması. Türkçe karakter ve büyük/küçük harf duyarsız
   (`kadikoy` → `KADIKÖY`)
-- Birlikte çalışan filtreler: **Açık**, **Boş yeri olan**, **Favoriler**
+- Birlikte çalışan filtreler: **Boş yeri olan**, **Favoriler**
 - Detay: adres, çalışma saatleri, kapasite, kaynakta yayımlanan tarife, aylık abonelik
 - Yerel favoriler. Ağ verisinden bağımsız saklanıyor, çevrimdışı da görünüyor
 - Harici harita uygulamasında yol tarifi (Google Maps → diğer harita uygulamaları → tarayıcı)
@@ -110,8 +110,10 @@ GitHub Actions iş akışları:
 
 ## Bilinen sınırlamalar
 
-- `isOpen` alanının anlamı kaynak tarafından belgelenmemiş. Uygulama değeri "Kapalı
-  (kaynağa göre)" olarak gösteriyor ve çalışma saatinden açıklık hesaplamıyor.
+- Açık/kapalı bilgisi gösterilmiyor. Kaynağın `isOpen` alanı belgelenmemiş ve yayımlanan
+  çalışma saatleriyle çelişiyor, bu yüzden okunmuyor
+  ([ADR-0014](docs/adr/0014-isopen-kullanilmiyor.md)). "Boş yer var" yalnızca doluluk
+  verisine dayanıyor. Çalışma saatleri detayda kaynaktaki metin olarak görünüyor.
 - Ücret alanlarının birimi belgelenmemiş. Tarife metni olduğu gibi gösteriliyor, "saatlik"
   gibi etiketler eklenmiyor. `freeTime` birimsiz ham sayı olarak gösteriliyor.
 - Alan yalnızca detayı indirilmiş otoparklar için çiziliyor. Haritada seçim, eksik detayı

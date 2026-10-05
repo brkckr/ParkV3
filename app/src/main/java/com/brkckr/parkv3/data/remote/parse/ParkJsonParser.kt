@@ -153,7 +153,6 @@ object ParkJsonParser {
             name = f.string("parkName"),
             district = f.string("district"),
             location = location(f),
-            openState = f.openState("isOpen"),
             capacity = f.int("capacity"),
             emptyCapacity = f.int("emptyCapacity"),
             workHours = f.string("workHours"),

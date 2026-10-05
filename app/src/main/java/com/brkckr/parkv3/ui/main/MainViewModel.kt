@@ -50,7 +50,6 @@ class MainViewModel @Inject constructor(
     private val mapStatus = mapAvailability.status()
 
     private val query = savedState.getStateFlow(KEY_QUERY, "")
-    private val openOnly = savedState.getStateFlow(KEY_OPEN, false)
     private val availableOnly = savedState.getStateFlow(KEY_AVAILABLE, false)
     private val favoritesOnly = savedState.getStateFlow(KEY_FAVORITES, false)
     private val viewMode = savedState.getStateFlow(
@@ -65,8 +64,8 @@ class MainViewModel @Inject constructor(
     private val events = Channel<MainEvent>(Channel.BUFFERED)
     val eventFlow: Flow<MainEvent> = events.receiveAsFlow()
 
-    private val filters: Flow<ParkFilters> = combine(openOnly, availableOnly, favoritesOnly) { open, available, favorites ->
-        ParkFilters(openOnly = open, availableOnly = available, favoritesOnly = favorites)
+    private val filters: Flow<ParkFilters> = combine(availableOnly, favoritesOnly) { available, favorites ->
+        ParkFilters(availableOnly = available, favoritesOnly = favorites)
     }
 
     private data class Controls(
@@ -152,14 +151,11 @@ class MainViewModel @Inject constructor(
 
     fun onClearQuery() = onQueryChange("")
 
-    fun onToggleOpenFilter() = toggle(KEY_OPEN, openOnly.value)
-
     fun onToggleAvailableFilter() = toggle(KEY_AVAILABLE, availableOnly.value)
 
     fun onToggleFavoritesFilter() = toggle(KEY_FAVORITES, favoritesOnly.value)
 
     fun onClearFilters() {
-        savedState[KEY_OPEN] = false
         savedState[KEY_AVAILABLE] = false
         savedState[KEY_FAVORITES] = false
     }
@@ -245,7 +241,6 @@ class MainViewModel @Inject constructor(
 
     private companion object {
         const val KEY_QUERY = "query"
-        const val KEY_OPEN = "filter_open"
         const val KEY_AVAILABLE = "filter_available"
         const val KEY_FAVORITES = "filter_favorites"
         const val KEY_VIEW_MODE = "view_mode"

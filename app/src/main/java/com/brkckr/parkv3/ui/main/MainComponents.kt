@@ -94,13 +94,11 @@ fun SearchField(query: String, onQueryChange: (String) -> Unit, onClear: () -> U
 @Composable
 fun FilterRow(
     filters: ParkFilters,
-    onToggleOpen: () -> Unit,
     onToggleAvailable: () -> Unit,
     onToggleFavorites: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     FlowRow(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        FilterToggle(stringResource(R.string.filter_open), filters.openOnly, onToggleOpen)
         FilterToggle(stringResource(R.string.filter_available), filters.availableOnly, onToggleAvailable)
         FilterToggle(stringResource(R.string.filter_favorites), filters.favoritesOnly, onToggleFavorites)
     }

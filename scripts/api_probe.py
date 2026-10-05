@@ -61,7 +61,7 @@ def field_table(records):
 def analyse_list(records):
     out = []
     is_open = collections.Counter(json.dumps(r.get("isOpen", "<missing>"), ensure_ascii=False) for r in records)
-    out.append("**isOpen distribution:** " + ", ".join(f"`{k}`×{v}" for k, v in is_open.most_common()))
+    out.append("**isOpen distribution** (not read by the app, docs/adr/0014): " + ", ".join(f"`{k}`×{v}" for k, v in is_open.most_common()))
 
     cap_missing = cap_nonpos = empty_missing = empty_neg = empty_gt_cap = 0
     for r in records:
