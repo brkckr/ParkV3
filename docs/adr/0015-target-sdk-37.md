@@ -12,7 +12,7 @@ targetSdk 37'ye çıkarıldı. Değişikliklerin ParkV3'e etkisi:
 
 | Değişiklik | Etki ve yapılan |
 |---|---|
-| Sertifika şeffaflığı (CT) varsayılan olarak açık | Uygulamanın tek sunucusu `api.ibb.gov.tr`. Sertifikası CT günlüklerinden SCT taşımazsa Android 17'de tüm istekler başarısız olur. API probu her çalışmada sunucu sertifikasındaki gömülü SCT'leri sayıyor, 2'den azsa sapma bildiriyor ([API_CONTRACT.md](../API_CONTRACT.md#sözleşme-kontrolü)) |
+| Sertifika şeffaflığı (CT) varsayılan olarak açık | Uygulamanın tek sunucusu `api.ibb.gov.tr`. Sertifikası CT günlüklerinden SCT taşımazsa Android 17'de tüm istekler başarısız olur. API probu her çalışmada sunucu sertifikasındaki gömülü SCT'leri sayıyor, 2'den azsa sapma bildiriyor ([API_CONTRACT.md](../API_CONTRACT.md#sözleşme-kontrolü)). İlk ölçüm (2026-10-05): sertifikayı veren COMODO RSA Organization Validation Secure Server CA (Sectigo), 3 gömülü SCT |
 | Encrypted Client Hello (ECH) varsayılan olarak açık | Sunucu ECH desteklemiyorsa istemci rastgele içerikli (GREASE) uzantı gönderiyor. Uygulamada yapılacak bir şey yok. Canlı API ile Android 17'de denenmedi |
 | Yerel ağ izni (`ACCESS_LOCAL_NETWORK`) | Uygulama yerel ağa bağlanmıyor. Cihaz testlerinin sahte sunucusu aynı süreçte `127.0.0.1` üzerinde. Belgeler loopback'in kapsamda olup olmadığını söylemiyor; API 37 emülatöründeki test çalıştırması bunu gösteriyor |
 | Kilitsiz `MessageQueue` | Uygulama kodu `MessageQueue`'ya reflection ile erişmiyor. Test altyapısı (Espresso, Compose test) API 37 emülatöründe çalıştırılarak kontrol ediliyor |
