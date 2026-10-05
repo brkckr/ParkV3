@@ -24,6 +24,7 @@ com.brkckr.parkv3
 │   ├── map/           Kümelemeli harita, harita kullanılabilirliği
 │   ├── detail/        DetailViewModel, detay ekranı
 │   ├── components/    Durum rozeti, biçimlendirme yardımcıları
+│   ├── language/      Uygulama içi dil seçimi (AppCompat uygulama başına dil)
 │   └── theme/         Material 3, açık/koyu tema, durum renkleri
 └── di/                Hilt modülleri (debug'a özel ağ logu src/debug altında)
 ```

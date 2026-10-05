@@ -124,6 +124,8 @@
     <string name="directions_no_app">Yol tarifini açabilecek bir uygulama bulunamadı.</string>
     <string name="action_show_on_map">Haritada göster</string>
     <string name="action_share">Paylaş</string>
+    <string name="action_language">Dil</string>
+    <string name="language_system">Sistem dili</string>
     <string name="share_chooser_title">Otoparkı paylaş</string>
     <string name="share_no_app">Paylaşmak için uygulama bulunamadı.</string>
 

@@ -61,7 +61,8 @@ yer değiştirmeme ve otoparkın konumuna yakınlık (`AreaPolygonParserTest`), 
 haritaya gelmesi ve haritada seçimde eksik detayın bir kez indirilmesi (`MainViewModelTest`),
 telefon ve tablet düzenleri (`ResultLayoutTest`, `AdaptiveLayoutTest`: Robolectric Google
 haritası çizemediği için harita yuvasına yer tutucu konuyor), paylaşım metni ve sistem
-paylaşım menüsü (`ShareTest`, Türkçe yerelde ondalık nokta dahil).
+paylaşım menüsü (`ShareTest`, Türkçe yerelde ondalık nokta dahil), dil seçimi
+(`AppLanguageTest`, `LanguageMenuTest`).
 
 ## İlkeler
 

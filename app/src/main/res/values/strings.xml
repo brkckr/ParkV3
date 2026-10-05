@@ -124,6 +124,11 @@
     <string name="directions_no_app">No app was found to open directions.</string>
     <string name="action_show_on_map">Show on map</string>
     <string name="action_share">Share</string>
+    <string name="action_language">Language</string>
+    <string name="language_system">System default</string>
+    <!-- Language names are shown in their own language, whatever the UI language. -->
+    <string name="language_turkish" translatable="false">Türkçe</string>
+    <string name="language_english" translatable="false">English</string>
     <string name="share_chooser_title">Share car park</string>
     <string name="share_no_app">No app available for sharing.</string>
 

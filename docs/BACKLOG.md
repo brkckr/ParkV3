@@ -9,22 +9,22 @@
 ## P2 — Ürün
 3. **Adres/yer araması** (hedefi adla seçmek). Places/Geocoding API ücretli. Maliyet ve
    hesap kararı gerektiriyor.
-4. **Uygulama içi dil seçimi.** Bugün sistemin uygulama başına dil ayarı destekleniyor
-   (`generateLocaleConfig`).
-5. **Harita erişilebilirliği.** TalkBack ile işaretlere gezinme. Bugün liste görünümü
+4. **Harita erişilebilirliği.** TalkBack ile işaretlere gezinme. Bugün liste görünümü
    erişilebilir alternatif.
 
 ## P3 — Mühendislik
-6. **Bağımlılık güncellemeleri.** `maps-compose` 9.x (çıkışı 2026-10-01),
+5. **Bağımlılık güncellemeleri.** `maps-compose` 9.x (çıkışı 2026-10-01),
     `play-services-location` 21.4.x (bu ortamdan Google Maven'a erişilemediği için
     doğrulanamadı).
-7. **Baseline profile ve açılış performansı ölçümü.**
-8. **Ekran görüntüsü (screenshot) testleri.** Açık/koyu tema ve büyük yazı.
-9. **Release imzalama CI'ı.** İmza anahtarı GitHub secrets'ta, AAB üretimi. Mağazaya
+6. **Baseline profile ve açılış performansı ölçümü.**
+7. **Ekran görüntüsü (screenshot) testleri.** Açık/koyu tema ve büyük yazı.
+8. **Release imzalama CI'ı.** İmza anahtarı GitHub secrets'ta, AAB üretimi. Mağazaya
     yükleme yok.
-10. **Ekran sayısı artarsa modüllere ayırma** (`:core:data`, `:feature:map` vb.).
+9. **Ekran sayısı artarsa modüllere ayırma** (`:core:data`, `:feature:map` vb.).
 
 ## Tamamlananlar
+- **Uygulama içi dil seçimi** (eski P2 #4). Ana ekrandaki dil düğmesiyle Sistem dili, Türkçe
+  veya English. Android 8–12'de de çalışıyor ([ADR-0013](adr/0013-uygulama-ici-dil.md)).
 - **Paylaşım** (eski P2 #6). Detay ekranından ad, adres ve harita bağlantısı sistem paylaşım
   menüsüyle gönderiliyor. Doluluk, birkaç dakikada eskidiği için eklenmiyor.
 - **Tablet ve geniş yatay ekran düzeni** (eski P2 #4). 840 dp ve üstünde liste ve harita yan
