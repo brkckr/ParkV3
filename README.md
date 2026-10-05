@@ -4,8 +4,9 @@
 uygulaması (Kotlin, Jetpack Compose).
 
 - Konumunuza veya haritada seçtiğiniz bir hedefe göre **kuş uçuşu** yakınlık sıralaması
-- Harita (kümelenmiş) ve liste görünümü, ortak filtre ve seçim. Seçili otoparkın alanı,
-  kaynakta varsa ve doğrulamadan geçerse haritada çiziliyor
+- Harita (kümelenmiş) ve liste görünümü, ortak filtre ve seçim. Tablette ve geniş yatay
+  ekranda (840 dp ve üstü) ikisi yan yana. Seçili otoparkın alanı, kaynakta varsa ve
+  doğrulamadan geçerse haritada çiziliyor
 - Otopark adı ve ilçe araması. Türkçe karakter ve büyük/küçük harf duyarsız
   (`kadikoy` → `KADIKÖY`)
 - Birlikte çalışan filtreler: **Açık**, **Boş yeri olan**, **Favoriler**

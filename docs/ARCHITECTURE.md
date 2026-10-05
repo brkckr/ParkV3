@@ -62,6 +62,11 @@ com.brkckr.parkv3
 Harita ve liste aynı `items` listesini ve aynı `selectedParkId` değerini kullanıyor.
 Listeden "Haritada göster" seçimi haritaya, haritadaki seçim listeye taşınıyor.
 
+Düzen pencere genişliğine göre seçiliyor (`resultLayout`): 840 dp ve üstünde, harita
+kullanılabiliyorsa liste (genişliğin %40'ı, 320–440 dp) ve harita yan yana duruyor ve
+harita/liste düğmesi gizleniyor. Daha dar ekranlarda tek bölme ve düğme var. Harita yoksa
+her genişlikte yalnızca liste. Detay ekranının içeriği geniş ekranda 640 dp ile sınırlı.
+
 ## Güvenlik ve gizlilik
 
 - Release derlemesinde OkHttp log kütüphanesi classpath'te bile yok
