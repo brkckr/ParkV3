@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ParkV3</string>
+
+    <!-- Ana ekran -->
+    <string name="search_hint">Otopark veya ilçe ara</string>
+    <string name="search_clear">Aramayı temizle</string>
+    <string name="action_refresh">Yenile</string>
+    <string name="view_map">Harita</string>
+    <string name="view_list">Liste</string>
+    <string name="filter_open">Açık</string>
+    <string name="filter_available">Boş yeri olan</string>
+    <string name="filter_favorites">Favoriler</string>
+    <string name="filters_clear">Filtreleri temizle</string>
+    <plurals name="result_count">
+        <item quantity="one">%2$d otoparktan %1$d tanesi</item>
+        <item quantity="other">%2$d otoparktan %1$d tanesi</item>
+    </plurals>
+
+    <!-- Sıralama / referans noktası -->
+    <string name="sort_by_name">Ada göre sıralı</string>
+    <string name="sort_by_location">Konumunuza uzaklığa göre sıralı</string>
+    <string name="sort_by_location_approximate">Yaklaşık konumunuza uzaklığa göre sıralı</string>
+    <string name="sort_by_destination">Seçilen hedefe uzaklığa göre sıralı</string>
+    <string name="destination_clear">Hedefi kaldır</string>
+    <string name="distance_m">Kuş uçuşu %1$d m</string>
+    <string name="distance_km">Kuş uçuşu %1$s km</string>
+    <string name="distance_unknown_location">Konum bilgisi yok</string>
+
+    <!-- Tazelik -->
+    <string name="freshness_updated">Son güncelleme %1$s</string>
+    <string name="freshness_never">Henüz indirilmedi</string>
+    <string name="freshness_refreshing">Yenileniyor…</string>
+    <string name="freshness_stale">Veriler güncel olmayabilir.</string>
+    <string name="freshness_offline">Çevrimdışı görünüyorsunuz. En son indirilen liste gösteriliyor.</string>
+    <string name="freshness_failed">Son yenileme başarısız: %1$s</string>
+    <string name="relative_just_now">az önce</string>
+    <plurals name="relative_minutes">
+        <item quantity="one">%1$d dakika önce</item>
+        <item quantity="other">%1$d dakika önce</item>
+    </plurals>
+    <plurals name="relative_hours">
+        <item quantity="one">%1$d saat önce</item>
+        <item quantity="other">%1$d saat önce</item>
+    </plurals>
+    <string name="time_with_relative">%1$s (%2$s)</string>
+    <string name="refresh_failed_snackbar">Yenilenemedi: %1$s</string>
+    <string name="refresh_partial_snackbar">Kaynak her zamankinden az otopark döndürdü; önceki kayıtlar korundu.</string>
+
+    <!-- Hatalar (sunucu metni asla gösterilmez) -->
+    <string name="error_network">internet bağlantısı yok</string>
+    <string name="error_http">sunucu %1$d hatası döndürdü</string>
+    <string name="error_malformed">kaynak okunamayan veri gönderdi</string>
+    <string name="error_empty">kaynak boş liste gönderdi</string>
+    <string name="error_not_found">otopark kaynakta bulunamadı</string>
+    <string name="error_unexpected">beklenmeyen bir hata oluştu</string>
+
+    <!-- Boş durumlar -->
+    <string name="empty_loading_title">Otoparklar yükleniyor…</string>
+    <string name="empty_offline_title">İnternet bağlantısı yok</string>
+    <string name="empty_offline_body">Otopark listesi henüz indirilmediği için çevrimdışı gösterilecek veri yok. İnternete bağlanıp tekrar deneyin.</string>
+    <string name="empty_error_title">Veri kaynağına ulaşılamadı</string>
+    <string name="empty_error_body">İSPARK servisi kullanılabilir bir liste döndürmedi (%1$s). Hiçbir veri silinmedi.</string>
+    <string name="empty_search_title">“%1$s” için sonuç yok</string>
+    <string name="empty_search_body">Yazımı kontrol edin veya ilçe adıyla arayın.</string>
+    <string name="empty_filters_title">Bu filtrelerle eşleşen otopark yok</string>
+    <string name="empty_filters_body">Filtreler birlikte uygulanır: otopark hepsine uymalıdır.</string>
+    <string name="empty_favorites_title">Henüz favori yok</string>
+    <string name="empty_favorites_body">Bir otoparkı açıp yıldıza dokunun; çevrimdışıyken de burada görünür.</string>
+    <string name="action_retry">Tekrar dene</string>
+
+    <!-- Kaynaktan kalkan favoriler -->
+    <string name="orphan_favorites_title">Kaynakta artık listelenmeyen favoriler</string>
+    <string name="orphan_favorite_unnamed">Otopark #%1$d</string>
+
+    <!-- Otopark durumu -->
+    <string name="status_available">Boş yer var</string>
+    <string name="status_full">Dolu</string>
+    <string name="status_closed">Kapalı (kaynağa göre)</string>
+    <string name="status_open_unknown_occupancy">Açık, doluluk bilinmiyor</string>
+    <string name="status_unknown">Durum bilinmiyor</string>
+    <plurals name="occupancy_known">
+        <item quantity="one">%2$d yerden %1$d boş</item>
+        <item quantity="other">%2$d yerden %1$d boş</item>
+    </plurals>
+    <string name="occupancy_capacity_only">Kapasite %1$d, boş yer bilinmiyor</string>
+    <string name="occupancy_missing">Doluluk bildirilmedi</string>
+    <string name="occupancy_inconsistent">Doluluk verisi tutarsız</string>
+    <string name="park_unnamed">Adsız otopark (#%1$d)</string>
+    <string name="district_unknown">İlçe bilinmiyor</string>
+
+    <!-- Favoriler -->
+    <string name="favorite_add">Favorilere ekle</string>
+    <string name="favorite_remove">Favorilerden çıkar</string>
+
+    <!-- Detay -->
+    <string name="detail_title">Otopark detayı</string>
+    <string name="action_back">Geri</string>
+    <string name="detail_status">Durum</string>
+    <string name="detail_status_source">Açık/kapalı bilgisi listeden alınır (%1$s).</string>
+    <string name="detail_occupancy">Doluluk</string>
+    <string name="detail_capacity">Kapasite</string>
+    <string name="detail_free_spaces">Boş yer</string>
+    <string name="detail_address">Adres</string>
+    <string name="detail_work_hours">Çalışma saatleri</string>
+    <string name="detail_park_type">Tür</string>
+    <string name="detail_free_time">Ücretsiz süre (kaynak değeri)</string>
+    <string name="detail_free_time_note">Kaynak birimi belirtmiyor.</string>
+    <string name="detail_tariffs">Tarife (kaynakta yayımlandığı gibi)</string>
+    <string name="detail_tariffs_missing">Kaynakta bu otopark için tarife yok.</string>
+    <string name="detail_monthly_fee">Aylık abonelik</string>
+    <string name="detail_monthly_fee_missing">Belirtilmemiş</string>
+    <string name="detail_fetched_at">Detay indirildi: %1$s</string>
+    <string name="detail_source_updated_at">Kaynak güncelleme zamanı: %1$s</string>
+    <string name="detail_source_updated_unknown">Kaynak güncelleme zamanı bildirmedi.</string>
+    <string name="detail_offline_cached">Daha önce indirilen detay gösteriliyor: %1$s</string>
+    <string name="detail_loading">Detay yükleniyor…</string>
+    <string name="detail_error_title">Detay yüklenemedi</string>
+    <string name="detail_error_body">Neden: %1$s</string>
+    <string name="detail_partial_from_list">Yalnızca liste verisi gösteriliyor; tam detay alınamadı (%1$s).</string>
+    <string name="detail_missing_from_source">Bu otopark kaynakta artık listelenmiyor.</string>
+    <string name="action_directions">Yol tarifi</string>
+    <string name="directions_unavailable_location">Kaynakta geçerli konum olmadığı için yol tarifi açılamıyor.</string>
+    <string name="directions_no_app">Yol tarifini açabilecek bir uygulama bulunamadı.</string>
+    <string name="action_show_on_map">Haritada göster</string>
+
+    <!-- Harita -->
+    <string name="map_unavailable_title">Harita kullanılamıyor</string>
+    <string name="map_unavailable_no_key">Bu derlemede Google Maps API anahtarı tanımlı değil. Liste, arama ve yol tarifi çalışmaya devam eder.</string>
+    <string name="map_unavailable_no_services">Bu cihazda Google Play hizmetleri yok. Liste, arama ve yol tarifi çalışmaya devam eder.</string>
+    <string name="map_set_destination">Harita merkezini hedef yap</string>
+    <string name="map_destination_hint">Hedef seçmek için haritaya uzun basın veya düğmeyi kullanın.</string>
+    <string name="map_destination_marker">Seçilen hedef</string>
+    <plurals name="map_hidden_without_location">
+        <item quantity="one">%1$d sonucun geçerli konumu yok, haritada gösterilmiyor.</item>
+        <item quantity="other">%1$d sonucun geçerli konumu yok, haritada gösterilmiyor.</item>
+    </plurals>
+    <string name="action_details">Detay</string>
+    <string name="action_close">Kapat</string>
+
+    <!-- Konum -->
+    <string name="action_my_location">Konumum</string>
+    <string name="location_locating">Güncel konumunuz alınıyor…</string>
+    <string name="location_denied">Konum izni verilmedi. Arama yapabilir ve haritada hedef seçebilirsiniz.</string>
+    <string name="location_permanently_denied">Bu uygulama için konum izni kapalı.</string>
+    <string name="location_services_disabled">Konum hizmetleri kapalı.</string>
+    <string name="location_unavailable">Konumunuz belirlenemedi. Açık alanda tekrar deneyin veya haritada hedef seçin.</string>
+    <string name="location_approximate">Yaklaşık konum kullanılıyor; mesafeler kabacadır.</string>
+    <string name="action_open_settings">Ayarları aç</string>
+    <string name="action_location_settings">Konum ayarları</string>
+    <string name="location_rationale_title">Konumunuz kullanılsın mı?</string>
+    <string name="location_rationale_body">Konumunuz yalnızca bu cihazda, otoparkları kuş uçuşu uzaklığa göre sıralamak için kullanılır. Uygulamayı konum olmadan da kullanabilirsiniz.</string>
+    <string name="action_continue">Devam</string>
+    <string name="action_not_now">Şimdi değil</string>
+
+    <!-- Required attribution for the CC BY 4.0 licensed source -->
+    <string name="data_attribution">Veri: İBB Açık Veri Portalı, CC BY 4.0</string>
+</resources>

@@ -1,0 +1,31 @@
+name: API contract probe
+
+# Measures the live behaviour of the İSPARK endpoints (docs/API_CONTRACT.md). It does not
+# gate the Android build: the source is an external service outside this repo's control.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 6 * * 1"
+  pull_request:
+    paths:
+      - scripts/api_probe.py
+      - .github/workflows/api-probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - name: Probe Park and ParkDetay
+        run: python3 scripts/api_probe.py --out probe-output
+      - name: Upload raw responses and report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-probe
+          path: probe-output/
+          if-no-files-found: ignore

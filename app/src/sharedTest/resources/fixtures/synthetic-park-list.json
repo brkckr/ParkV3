@@ -1,0 +1,11 @@
+[
+  {"parkID": 101, "parkName": "Kadıköy Rıhtım Otoparkı", "lat": "40.9903", "lng": "29.0236", "capacity": 200, "emptyCapacity": 35, "workHours": "24 Saat", "parkType": "AÇIK OTOPARK", "freeTime": 15, "district": "KADIKÖY", "isOpen": 1},
+  {"parkID": "102", "parkName": "İstinye Park Yolu", "lat": "41,1102", "lng": 29.0581, "capacity": "150", "emptyCapacity": "0", "workHours": "08:00-24:00", "parkType": "YOL ÜSTÜ", "freeTime": "0", "district": "SARIYER", "isOpen": "1"},
+  {"parkID": 103, "parkName": "Şişli Merkez Katlı", "lat": "41.0602", "lng": "28.9877", "capacity": 300, "emptyCapacity": 120, "workHours": "24 Saat", "parkType": "KAPALI OTOPARK", "freeTime": 10, "district": "ŞİŞLİ", "isOpen": 0},
+  {"parkID": 104, "parkName": "Beşiktaş Sahil", "lat": "41.0422", "lng": "29.0083", "capacity": 80, "emptyCapacity": 20, "district": "BEŞİKTAŞ"},
+  {"parkID": 105, "parkName": "Üsküdar Meydan", "lat": "41.0255", "lng": "29.0152", "capacity": 100, "emptyCapacity": 140, "district": "ÜSKÜDAR", "isOpen": 1},
+  {"parkID": 106, "parkName": "Çamlıca Tepe", "lat": "0", "lng": "0", "capacity": null, "emptyCapacity": null, "district": "ÜSKÜDAR", "isOpen": true},
+  {"parkID": 107, "parkName": "Fatih Yol Üstü", "lat": "28.9497", "lng": "41.0186", "capacity": 50, "emptyCapacity": 5, "district": "FATİH", "isOpen": 1},
+  {"parkName": "Kimliksiz Kayıt", "lat": "41.0", "lng": "29.0", "capacity": 10, "emptyCapacity": 1, "isOpen": 1},
+  {"parkID": 101, "parkName": "Kadıköy Rıhtım Otoparkı (yinelenen)", "lat": "40.9903", "lng": "29.0236", "capacity": 999, "emptyCapacity": 999, "isOpen": 0}
+]

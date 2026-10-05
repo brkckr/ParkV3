@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ParkV3</string>
+
+    <!-- Main screen -->
+    <string name="search_hint">Search by car park or district</string>
+    <string name="search_clear">Clear search</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="view_map">Map</string>
+    <string name="view_list">List</string>
+    <string name="filter_open">Open</string>
+    <string name="filter_available">Has free spaces</string>
+    <string name="filter_favorites">Favorites</string>
+    <string name="filters_clear">Clear filters</string>
+    <plurals name="result_count">
+        <item quantity="one">%1$d of %2$d car park</item>
+        <item quantity="other">%1$d of %2$d car parks</item>
+    </plurals>
+
+    <!-- Sorting / reference point -->
+    <string name="sort_by_name">Sorted by name</string>
+    <string name="sort_by_location">Sorted by distance from you</string>
+    <string name="sort_by_location_approximate">Sorted by distance from your approximate location</string>
+    <string name="sort_by_destination">Sorted by distance from the selected destination</string>
+    <string name="destination_clear">Clear destination</string>
+    <string name="distance_m">%1$d m straight-line</string>
+    <string name="distance_km">%1$s km straight-line</string>
+    <string name="distance_unknown_location">No location data</string>
+
+    <!-- Freshness -->
+    <string name="freshness_updated">Updated %1$s</string>
+    <string name="freshness_never">Not downloaded yet</string>
+    <string name="freshness_refreshing">Refreshing…</string>
+    <string name="freshness_stale">Data may be out of date.</string>
+    <string name="freshness_offline">You appear to be offline. Showing the last downloaded list.</string>
+    <string name="freshness_failed">Last refresh failed: %1$s</string>
+    <string name="relative_just_now">just now</string>
+    <plurals name="relative_minutes">
+        <item quantity="one">%1$d minute ago</item>
+        <item quantity="other">%1$d minutes ago</item>
+    </plurals>
+    <plurals name="relative_hours">
+        <item quantity="one">%1$d hour ago</item>
+        <item quantity="other">%1$d hours ago</item>
+    </plurals>
+    <string name="time_with_relative">%1$s (%2$s)</string>
+    <string name="refresh_failed_snackbar">Couldn\'t refresh: %1$s</string>
+    <string name="refresh_partial_snackbar">The source returned fewer car parks than usual; previous ones were kept.</string>
+
+    <!-- Errors (never include server text) -->
+    <string name="error_network">no internet connection</string>
+    <string name="error_http">the server responded with error %1$d</string>
+    <string name="error_malformed">the source sent unreadable data</string>
+    <string name="error_empty">the source sent an empty list</string>
+    <string name="error_not_found">the car park was not found at the source</string>
+    <string name="error_unexpected">an unexpected error occurred</string>
+
+    <!-- Empty states -->
+    <string name="empty_loading_title">Loading car parks…</string>
+    <string name="empty_offline_title">No internet connection</string>
+    <string name="empty_offline_body">The car park list hasn\'t been downloaded yet, so there is nothing to show offline. Connect to the internet and try again.</string>
+    <string name="empty_error_title">Couldn\'t reach the data source</string>
+    <string name="empty_error_body">The İSPARK service didn\'t return a usable list (%1$s). Nothing was deleted.</string>
+    <string name="empty_search_title">No results for “%1$s”</string>
+    <string name="empty_search_body">Check the spelling or search for a district name.</string>
+    <string name="empty_filters_title">No car parks match these filters</string>
+    <string name="empty_filters_body">Filters are combined: a car park must match all of them.</string>
+    <string name="empty_favorites_title">No favorites yet</string>
+    <string name="empty_favorites_body">Open a car park and tap the star to keep it here, even offline.</string>
+    <string name="action_retry">Try again</string>
+
+    <!-- Orphan favorites -->
+    <string name="orphan_favorites_title">Favorites no longer listed by the source</string>
+    <string name="orphan_favorite_unnamed">Car park #%1$d</string>
+
+    <!-- Park status -->
+    <string name="status_available">Free spaces</string>
+    <string name="status_full">Full</string>
+    <string name="status_closed">Closed (per source)</string>
+    <string name="status_open_unknown_occupancy">Open, occupancy unknown</string>
+    <string name="status_unknown">Status unknown</string>
+    <plurals name="occupancy_known">
+        <item quantity="one">%1$d free space of %2$d</item>
+        <item quantity="other">%1$d free spaces of %2$d</item>
+    </plurals>
+    <string name="occupancy_capacity_only">Capacity %1$d, free spaces unknown</string>
+    <string name="occupancy_missing">Occupancy not reported</string>
+    <string name="occupancy_inconsistent">Occupancy data inconsistent</string>
+    <string name="park_unnamed">Unnamed car park (#%1$d)</string>
+    <string name="district_unknown">District unknown</string>
+
+    <!-- Favorites -->
+    <string name="favorite_add">Add to favorites</string>
+    <string name="favorite_remove">Remove from favorites</string>
+
+    <!-- Detail -->
+    <string name="detail_title">Car park details</string>
+    <string name="action_back">Back</string>
+    <string name="detail_status">Status</string>
+    <string name="detail_status_source">Open/closed comes from the list (%1$s).</string>
+    <string name="detail_occupancy">Occupancy</string>
+    <string name="detail_capacity">Capacity</string>
+    <string name="detail_free_spaces">Free spaces</string>
+    <string name="detail_address">Address</string>
+    <string name="detail_work_hours">Working hours</string>
+    <string name="detail_park_type">Type</string>
+    <string name="detail_free_time">Free time (source value)</string>
+    <string name="detail_free_time_note">The source doesn\'t state the unit.</string>
+    <string name="detail_tariffs">Tariff (as published by the source)</string>
+    <string name="detail_tariffs_missing">The source has no tariff for this car park.</string>
+    <string name="detail_monthly_fee">Monthly subscription</string>
+    <string name="detail_monthly_fee_missing">Not specified</string>
+    <string name="detail_fetched_at">Details downloaded %1$s</string>
+    <string name="detail_source_updated_at">Source updated: %1$s</string>
+    <string name="detail_source_updated_unknown">The source didn\'t report an update time.</string>
+    <string name="detail_offline_cached">Showing previously downloaded details: %1$s</string>
+    <string name="detail_loading">Loading details…</string>
+    <string name="detail_error_title">Couldn\'t load details</string>
+    <string name="detail_error_body">Reason: %1$s</string>
+    <string name="detail_partial_from_list">Showing list data only; full details are unavailable (%1$s).</string>
+    <string name="detail_missing_from_source">This car park is no longer listed by the source.</string>
+    <string name="action_directions">Directions</string>
+    <string name="directions_unavailable_location">No valid location from the source, so directions can\'t be opened.</string>
+    <string name="directions_no_app">No app was found to open directions.</string>
+    <string name="action_show_on_map">Show on map</string>
+
+    <!-- Map -->
+    <string name="map_unavailable_title">Map unavailable</string>
+    <string name="map_unavailable_no_key">No Google Maps API key was configured for this build. The list, search and directions still work.</string>
+    <string name="map_unavailable_no_services">Google Play services aren\'t available on this device. The list, search and directions still work.</string>
+    <string name="map_set_destination">Use map centre as destination</string>
+    <string name="map_destination_hint">Long-press the map or use the button to set a destination.</string>
+    <string name="map_destination_marker">Selected destination</string>
+    <plurals name="map_hidden_without_location">
+        <item quantity="one">%1$d result has no valid location and isn\'t shown on the map.</item>
+        <item quantity="other">%1$d results have no valid location and aren\'t shown on the map.</item>
+    </plurals>
+    <string name="action_details">Details</string>
+    <string name="action_close">Close</string>
+
+    <!-- Location -->
+    <string name="action_my_location">My location</string>
+    <string name="location_locating">Getting your current location…</string>
+    <string name="location_denied">Location permission denied. You can still search and pick a destination on the map.</string>
+    <string name="location_permanently_denied">Location permission is turned off for this app.</string>
+    <string name="location_services_disabled">Location services are turned off.</string>
+    <string name="location_unavailable">Your location couldn\'t be determined. Try again outdoors or pick a destination on the map.</string>
+    <string name="location_approximate">Using approximate location; distances are rough.</string>
+    <string name="action_open_settings">Open settings</string>
+    <string name="action_location_settings">Location settings</string>
+    <string name="location_rationale_title">Use your location?</string>
+    <string name="location_rationale_body">Your location is only used on this device to sort car parks by straight-line distance. You can use the app without it.</string>
+    <string name="action_continue">Continue</string>
+    <string name="action_not_now">Not now</string>
+
+    <!-- Required attribution for the CC BY 4.0 licensed source -->
+    <string name="data_attribution">Data: Istanbul Metropolitan Municipality (İBB) Open Data Portal, CC BY 4.0</string>
+</resources>
