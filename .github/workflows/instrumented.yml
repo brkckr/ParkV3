@@ -42,6 +42,22 @@ jobs:
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           script: ./gradlew --stacktrace connectedDebugAndroidTest
+      - name: Print device test failures
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import glob, xml.etree.ElementTree as ET
+          files = glob.glob("app/build/outputs/androidTest-results/connected/**/*.xml", recursive=True)
+          total = failed = 0
+          for f in files:
+              for case in ET.parse(f).getroot().iter("testcase"):
+                  total += 1
+                  for tag in ("failure", "error"):
+                      for node in case.findall(tag):
+                          failed += 1
+                          print(f"FAILED {case.get('classname')}.{case.get('name')}\n{(node.text or node.get('message') or '')[:4000]}\n")
+          print(f"device tests: {total} run, {failed} failed")
+          PY
       - name: Upload device test reports
         if: always()
         uses: actions/upload-artifact@v4

@@ -103,6 +103,14 @@ room {
     schemaDirectory("$projectDir/schemas")
 }
 
+// Full failure output in the build log (CI artifacts are not always reachable).
+tasks.withType<Test>().configureEach {
+    testLogging {
+        events("failed")
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    }
+}
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)

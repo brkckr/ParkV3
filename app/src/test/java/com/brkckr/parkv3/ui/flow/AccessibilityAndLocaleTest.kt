@@ -8,7 +8,12 @@ import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onFirst
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performScrollToNode
+import com.brkckr.parkv3.ui.main.MainTestTags
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.brkckr.parkv3.domain.ParkFilters
@@ -30,6 +35,7 @@ import org.robolectric.annotation.Config
 
 /** Stateless screen checks: Turkish UI, very large font, labelled controls. */
 @RunWith(AndroidJUnit4::class)
+@Config(qualifiers = "w411dp-h891dp")
 class AccessibilityAndLocaleTest {
 
     @get:Rule
@@ -53,7 +59,7 @@ class AccessibilityAndLocaleTest {
     private fun render() = composeRule.setContent { ParkTheme { MainScreen(state(), MainActions()) } }
 
     @Test
-    @Config(qualifiers = "tr")
+    @Config(qualifiers = "tr-w411dp-h891dp")
     fun turkishLabelsAndStatusesAreShown() {
         render()
 
@@ -69,11 +75,12 @@ class AccessibilityAndLocaleTest {
         RuntimeEnvironment.setFontScale(2.0f)
         render()
 
-        composeRule.onNodeWithText("Kadıköy Rıhtım Otoparkı").assertIsDisplayed()
+        // Filter chips wrap instead of being cut off; controls keep 48dp touch targets.
         composeRule.onNodeWithText("Has free spaces").assertIsDisplayed()
-        composeRule.onAllNodesWithContentDescription("Remove from favorites").onFirst()
-            .assertHeightIsAtLeast(48.dp)
-            .assertWidthIsAtLeast(48.dp)
+        composeRule.onNodeWithContentDescription("Refresh").assertHeightIsAtLeast(48.dp).assertWidthIsAtLeast(48.dp)
+        composeRule.onNodeWithTag(MainTestTags.PARK_LIST).performScrollToNode(hasText("Kadıköy Rıhtım Otoparkı"))
+        composeRule.onNodeWithText("Kadıköy Rıhtım Otoparkı").assertIsDisplayed()
+        composeRule.onNodeWithTag(MainTestTags.favoriteToggle(1)).assertHeightIsAtLeast(48.dp).assertWidthIsAtLeast(48.dp)
     }
 
     @Test
