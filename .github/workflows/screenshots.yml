@@ -1,0 +1,69 @@
+name: Screenshot tests
+
+# Robolectric screenshots of the main screens (docs/TESTING.md). No images are committed:
+# every push to main records them and caches the result; a pull request compares its
+# screenshots with the latest cached main and uploads the images either way. Not a required
+# check, so an intended UI change never blocks a merge; the uploaded diffs show what changed.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  SCREENSHOT_TESTS: com.brkckr.parkv3.ui.screenshots.*
+
+jobs:
+  screenshots:
+    name: Screenshots
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v5
+
+      - name: Record (main)
+        if: github.event_name != 'pull_request'
+        run: ./gradlew --stacktrace testDebugUnitTest --tests "$SCREENSHOT_TESTS" -Proborazzi.test.record=true
+      - name: Cache the main screenshots
+        if: github.event_name != 'pull_request'
+        uses: actions/cache/save@v4
+        with:
+          path: app/build/outputs/roborazzi
+          key: roborazzi-${{ github.sha }}
+
+      - name: Restore the main screenshots
+        id: baseline
+        if: github.event_name == 'pull_request'
+        uses: actions/cache/restore@v4
+        with:
+          path: app/build/outputs/roborazzi
+          key: roborazzi-${{ github.event.pull_request.base.sha }}
+          restore-keys: roborazzi-
+      - name: Compare with main
+        if: github.event_name == 'pull_request' && steps.baseline.outputs.cache-matched-key != ''
+        run: ./gradlew --stacktrace testDebugUnitTest --tests "$SCREENSHOT_TESTS" -Proborazzi.test.verify=true
+      - name: Record (no main screenshots cached yet)
+        if: github.event_name == 'pull_request' && steps.baseline.outputs.cache-matched-key == ''
+        run: |
+          echo "::notice::No cached main screenshots yet; recording only. Comparison starts after this merges."
+          ./gradlew --stacktrace testDebugUnitTest --tests "$SCREENSHOT_TESTS" -Proborazzi.test.record=true
+
+      - name: Upload screenshots and diffs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: app/build/outputs/roborazzi/
+          if-no-files-found: ignore

@@ -8,6 +8,7 @@
 | Robolectric | `app/src/test` | Repository + in-memory Room, yol tarifi intent zinciri, `ConnectivityManager` ile bağlantı izleyicisi, Hilt ile uçtan uca Compose akışları, erişilebilirlik ve yerelleştirme | aynı komut |
 | Cihaz | `app/src/androidTest` | Room şeması ve mevcut veritabanında favorilerin korunması, cihazda ana akış | `./gradlew connectedDebugAndroidTest` |
 | Lint | — | Android lint (hata olursa derleme kırılır) | `./gradlew lintDebug` |
+| Ekran görüntüsü | `app/src/test/.../ui/screenshots` | Ana liste (açık, koyu, Türkçe + büyük yazı), çevrimdışı boş durum, detay, tablet düzeni | Aşağıya bakın |
 | Python | `scripts/test_api_contract.py` | API sözleşme kontrolü (ağsız, sentetik yanıtlarla) | `python3 -m unittest discover -s scripts` |
 
 Ortak test altyapısı `app/src/sharedTest` altında: sahte İSPARK sunucusu (`TestServer`),
@@ -15,6 +16,27 @@ Hilt test modülleri, `FakeLocationProvider` ve **sentetik** fixture'lar. JVM ve
 testleri bunları birlikte kullanıyor. Hiçbir test canlı API'ye gitmiyor. Canlı sözleşme ayrı
 `api-probe` iş akışıyla ölçülüp sözleşmeyle karşılaştırılıyor
 ([API_CONTRACT.md](API_CONTRACT.md#sözleşme-kontrolü)).
+
+### Ekran görüntüsü testleri
+
+Robolectric'in yerel grafik modunda [Roborazzi](https://github.com/takahirom/roborazzi) ile
+alınıyor. Saat ve saat dilimi sabit, böylece görüntüler çalışmadan çalışmaya değişmiyor.
+Görüntüler repoya eklenmiyor:
+
+- `main`'e her push'ta `Screenshot tests` iş akışı görüntüleri kaydediyor ve önbelleğe alıyor.
+- PR'larda son `main` görüntüleriyle karşılaştırıyor. Fark varsa iş kırmızı oluyor ve
+  farklar (`*_compare.png`) `screenshots` artefaktına yükleniyor. Zorunlu kontrol değil:
+  bilinçli bir arayüz değişikliği birleştirmeyi engellemiyor.
+- Normal unit test çalışmasında bu testler ekranları yalnızca çiziyor, görüntü almıyor.
+
+Yerelde kaydetmek için:
+
+```bash
+./gradlew testDebugUnitTest --tests 'com.brkckr.parkv3.ui.screenshots.*' -Proborazzi.test.record=true
+```
+
+Görüntüler `app/build/outputs/roborazzi/` altına yazılıyor. Karşılaştırma için aynı komut
+`-Proborazzi.test.verify=true` ile çalıştırılıyor.
 
 ### Cihaz testlerini çalıştırma
 

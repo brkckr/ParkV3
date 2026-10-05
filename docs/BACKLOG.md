@@ -18,12 +18,14 @@
    alınamadı) ve Google Maven'daki kütüphaneler (`play-services-location`, AndroidX, AGP).
    Google Maven'a erişebilen bir ortamda kontrol edilmeli.
 6. **Baseline profile ve açılış performansı ölçümü.**
-7. **Ekran görüntüsü (screenshot) testleri.** Açık/koyu tema ve büyük yazı.
-8. **Release imzalama CI'ı.** İmza anahtarı GitHub secrets'ta, AAB üretimi. Mağazaya
+7. **Release imzalama CI'ı.** İmza anahtarı GitHub secrets'ta, AAB üretimi. Mağazaya
     yükleme yok.
-9. **Ekran sayısı artarsa modüllere ayırma** (`:core:data`, `:feature:map` vb.).
+8. **Ekran sayısı artarsa modüllere ayırma** (`:core:data`, `:feature:map` vb.).
 
 ## Tamamlananlar
+- **Ekran görüntüsü testleri** (eski P3). Roborazzi ile ana liste (açık, koyu, Türkçe + büyük
+  yazı), çevrimdışı durum, detay ve tablet düzeni. PR'larda son `main` ile karşılaştırma
+  ([TESTING.md](TESTING.md#ekran-görüntüsü-testleri)).
 - **Bağımlılık güncellemeleri, Maven Central kısmı.** Kotlin 2.4.20, maps-compose 9.0.0. Diğer
   Maven Central bağımlılıkları zaten günceldi ([ADR-0011](adr/0011-surum-secimi.md)).
 - **Harita işaretlerinin ekran okuyucu metni** (eski P2 harita erişilebilirliği maddesinin

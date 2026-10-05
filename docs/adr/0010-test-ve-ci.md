@@ -15,7 +15,8 @@
 - Tüm fixture'lar `app/src/test/resources/fixtures/` altında ve "SENTETİK" olarak
   işaretli. Canlı veri gibi sunulmuyor.
 - CI işleri: `unit-test`, `lint`, `assemble-debug` (APK artefaktı), `instrumented`
-  (emülatör) ve ayrı `api-probe` (canlı uç nokta sözleşme kontrolü). `api-probe` Android
+  (emülatör), `screenshots` (Roborazzi, PR'da son `main` ile karşılaştırma, zorunlu değil)
+  ve ayrı `api-probe` (canlı uç nokta sözleşme kontrolü). `api-probe` Android
   derlemesini engellemiyor: kaynak bu reponun kontrolünde değil. Sapmayı haftalık çalışmada
   issue olarak bildiriyor.
 

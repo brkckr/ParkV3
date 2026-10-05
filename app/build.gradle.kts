@@ -7,6 +7,8 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.room)
+    // Screenshot tests on Robolectric (docs/TESTING.md, "Ekran görüntüsü testleri").
+    alias(libs.plugins.roborazzi)
 }
 
 // The Maps key comes from the MAPS_API_KEY environment variable or the git-ignored
@@ -155,6 +157,7 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.okhttp.mockwebserver)
     testImplementation(libs.robolectric)
+    testImplementation(libs.roborazzi)
     testImplementation(libs.androidx.test.core)
     testImplementation(libs.androidx.test.ext.junit)
     testImplementation(libs.androidx.room.testing)
