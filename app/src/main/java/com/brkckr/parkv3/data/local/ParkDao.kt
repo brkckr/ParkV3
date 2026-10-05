@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
+import com.brkckr.parkv3.domain.model.Park
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -29,10 +30,10 @@ interface ParkDao {
     suspend fun upsertParks(parks: List<ParkEntity>)
 
     @Query(
-        "UPDATE parks SET missingSinceMillis = :syncStamp " +
-            "WHERE lastSeenAtMillis != :syncStamp AND missingSinceMillis IS NULL",
+        "UPDATE parks SET missingSinceMillis = :nowMillis " +
+            "WHERE lastSeenSyncId != :syncId AND missingSinceMillis IS NULL",
     )
-    suspend fun markUnseenAsMissing(syncStamp: Long)
+    suspend fun markUnseenAsMissing(syncId: Long, nowMillis: Long)
 
     @Query("DELETE FROM parks WHERE missingSinceMillis IS NOT NULL AND missingSinceMillis < :cutoffMillis")
     suspend fun purgeMissingBefore(cutoffMillis: Long)
@@ -42,13 +43,14 @@ interface ParkDao {
 
     /** Applies an accepted list response atomically (docs/adr/0004). */
     @Transaction
-    suspend fun applyListSync(parks: List<ParkEntity>, markMissing: Boolean, syncStamp: Long, purgeCutoffMillis: Long) {
-        upsertParks(parks)
-        if (markMissing) markUnseenAsMissing(syncStamp)
+    suspend fun applyListSync(parks: List<Park>, markMissing: Boolean, nowMillis: Long, purgeCutoffMillis: Long) {
+        ensureSyncStateRow()
+        val syncId = currentSyncId() + 1
+        upsertParks(parks.map { it.toEntity(syncId = syncId, nowMillis = nowMillis) })
+        if (markMissing) markUnseenAsMissing(syncId, nowMillis)
         purgeMissingBefore(purgeCutoffMillis)
         deleteOrphanDetails()
-        ensureSyncStateRow()
-        recordListSuccess(syncStamp)
+        recordListSuccess(nowMillis, syncId)
     }
 
     // Sync state
@@ -59,14 +61,17 @@ interface ParkDao {
     @Query("SELECT * FROM sync_state WHERE id = 0")
     suspend fun getSyncState(): SyncStateEntity?
 
-    @Query("INSERT OR IGNORE INTO sync_state (id) VALUES (0)")
+    @Query("INSERT OR IGNORE INTO sync_state (id, syncId) VALUES (0, 0)")
     suspend fun ensureSyncStateRow()
 
+    @Query("SELECT syncId FROM sync_state WHERE id = 0")
+    suspend fun currentSyncId(): Long
+
     @Query(
-        "UPDATE sync_state SET lastSuccessAtMillis = :nowMillis, lastAttemptAtMillis = :nowMillis, " +
-            "lastErrorKind = NULL, lastErrorCode = NULL WHERE id = 0",
+        "UPDATE sync_state SET syncId = :syncId, lastSuccessAtMillis = :nowMillis, " +
+            "lastAttemptAtMillis = :nowMillis, lastErrorKind = NULL, lastErrorCode = NULL WHERE id = 0",
     )
-    suspend fun recordListSuccess(nowMillis: Long)
+    suspend fun recordListSuccess(nowMillis: Long, syncId: Long)
 
     /** Leaves lastSuccessAtMillis untouched on purpose. */
     @Query(

@@ -8,7 +8,9 @@ sayılıyor:
 3. Geçersiz kimlikli kayıtlar toplamın yarısından fazla değil.
 
 Tam ve başarılı yanıtta (tek transaction):
-- Gelen kayıtlar upsert ediliyor: `lastSeenAt = now`, `missingSince = null`.
+- Her kabul edilen yanıt `sync_state.syncId` sayacını bir artırıyor. Gelen kayıtlar bu
+  numarayla upsert ediliyor: `lastSeenSyncId = syncId`, `missingSince = null`. Kayıp tespiti
+  cihaz saatine değil bu sayaca dayanıyor, böylece saat geri alınsa da doğru çalışıyor.
 - **Küçülme koruması**: Önbellekte en az 20 aktif kayıt varken yeni yanıt, aktif kayıtların
   %50'sinden azını içeriyorsa yanıt "kısmi" kabul ediliyor. Bu durumda kayıtlar upsert
   ediliyor ama hiçbir kayıt kayıp olarak işaretlenmiyor.

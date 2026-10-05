@@ -10,7 +10,7 @@ import com.brkckr.parkv3.domain.model.RefreshError
 import com.brkckr.parkv3.domain.model.SourceTimestamp
 import com.brkckr.parkv3.domain.model.SyncInfo
 
-fun Park.toEntity(syncStamp: Long) = ParkEntity(
+fun Park.toEntity(syncId: Long, nowMillis: Long) = ParkEntity(
     id = id,
     name = name,
     district = district,
@@ -22,7 +22,8 @@ fun Park.toEntity(syncStamp: Long) = ParkEntity(
     workHours = workHours,
     parkType = parkType,
     freeTime = freeTime,
-    lastSeenAtMillis = syncStamp,
+    lastSeenSyncId = syncId,
+    lastSeenAtMillis = nowMillis,
     missingSinceMillis = null,
 )
 

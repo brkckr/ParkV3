@@ -6,9 +6,10 @@ import androidx.room.PrimaryKey
 import com.brkckr.parkv3.domain.model.OpenState
 
 /**
- * Last list snapshot. [lastSeenAtMillis] is the sync stamp of the last response that
- * contained the park; [missingSinceMillis] is set when a complete response no longer
- * contained it (docs/adr/0004). Coordinates are stored only when valid.
+ * Last list snapshot. [lastSeenSyncId] is the generation of the last accepted response that
+ * contained the park (a counter, so it does not depend on the device clock);
+ * [missingSinceMillis] is set when a complete response no longer contained it
+ * (docs/adr/0004). Coordinates are stored only when valid.
  */
 @Entity(tableName = "parks", indices = [Index("missingSinceMillis")])
 data class ParkEntity(
@@ -23,6 +24,7 @@ data class ParkEntity(
     val workHours: String?,
     val parkType: String?,
     val freeTime: Int?,
+    val lastSeenSyncId: Long,
     val lastSeenAtMillis: Long,
     val missingSinceMillis: Long?,
 )
@@ -61,10 +63,11 @@ data class FavoriteEntity(
     val addedAtMillis: Long,
 )
 
-/** Single-row list sync bookkeeping (id is always 0). */
+/** Single-row list sync bookkeeping (id is always 0). [syncId] counts accepted responses. */
 @Entity(tableName = "sync_state")
 data class SyncStateEntity(
     @PrimaryKey val id: Int = 0,
+    val syncId: Long = 0,
     val lastSuccessAtMillis: Long? = null,
     val lastAttemptAtMillis: Long? = null,
     val lastErrorKind: String? = null,

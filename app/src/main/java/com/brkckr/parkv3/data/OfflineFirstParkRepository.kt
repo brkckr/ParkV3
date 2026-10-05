@@ -107,9 +107,9 @@ class OfflineFirstParkRepository @Inject constructor(
             is ListSyncDecision.Apply -> {
                 val now = clock.nowMillis()
                 dao.applyListSync(
-                    parks = decision.parks.map { it.toEntity(syncStamp = now) },
+                    parks = decision.parks,
                     markMissing = decision.markMissing,
-                    syncStamp = now,
+                    nowMillis = now,
                     purgeCutoffMillis = now - PURGE_MISSING_AFTER_MS,
                 )
                 RefreshResult.Success(partial = !decision.markMissing)
