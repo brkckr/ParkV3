@@ -53,12 +53,15 @@ jobs:
           # The default data partition is too small for the Android 17 image to install the
           # app ("Requested internal only, but not enough space").
           disk-size: 8G
+          ram-size: 4096M
+          cores: 4
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           # The action runs each line on its own.
           script: |
             bash .github/scripts/emulator-ready.sh
             ./gradlew --stacktrace connectedDebugAndroidTest
+            bash .github/scripts/emulator-diagnostics.sh
       - name: Print device test failures
         if: always()
         run: |
