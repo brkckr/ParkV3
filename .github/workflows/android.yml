@@ -29,11 +29,15 @@ jobs:
         run: ./gradlew --stacktrace testDebugUnitTest
       - name: Check that the exported Room schema is committed
         # Migration tests and future auto-migrations rely on app/schemas being versioned.
+        # Compared as JSON so formatting-only differences do not fail the build.
         run: |
-          changed="$(git ls-files --others --modified --exclude-standard app/schemas)"
-          if [ -n "$changed" ]; then
+          problems="$(git ls-files --others --exclude-standard app/schemas)"
+          for f in $(git diff --name-only -- app/schemas); do
+            python3 -c 'import json,subprocess,sys; p=sys.argv[1]; a=json.loads(subprocess.check_output(["git","show","HEAD:"+p])); b=json.load(open(p)); sys.exit(a!=b)' "$f" || problems="$problems $f"
+          done
+          if [ -n "$problems" ]; then
             echo "::error::Room schema changed but is not committed:"
-            for f in $changed; do echo "===== $f"; cat "$f"; echo; done
+            for f in $problems; do echo "===== $f"; cat "$f"; echo; done
             exit 1
           fi
       - name: Upload test reports

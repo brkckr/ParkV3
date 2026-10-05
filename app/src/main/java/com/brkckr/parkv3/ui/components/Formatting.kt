@@ -8,7 +8,6 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.core.os.ConfigurationCompat
 import com.brkckr.parkv3.R
 import com.brkckr.parkv3.domain.model.Clock
 import com.brkckr.parkv3.domain.model.Occupancy
@@ -37,10 +36,10 @@ fun rememberNow(): Long {
     return now
 }
 
+/** The UI locale, read observably so a language change recomposes formatted text. */
 @Composable
 @ReadOnlyComposable
-fun currentLocale(): Locale =
-    ConfigurationCompat.getLocales(LocalConfiguration.current)[0] ?: Locale.getDefault()
+fun currentLocale(): Locale = LocalConfiguration.current.locales[0]
 
 /** Server text is never shown; only typed, localized reasons (and an HTTP status code). */
 @Composable
