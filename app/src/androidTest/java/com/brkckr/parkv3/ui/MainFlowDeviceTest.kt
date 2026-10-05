@@ -54,10 +54,11 @@ class MainFlowDeviceTest {
     @Test
     fun listSearchDetailFavoriteAndBack() {
         scenario = ActivityScenario.launch(MainActivity::class.java)
-        composeRule.waitUntil(15_000) { composeRule.onAllNodes(hasTestTag(MainTestTags.parkRow(101))).fetchSemanticsNodes().isNotEmpty() }
+        // Sorted by Turkish alphabet: Beşiktaş (104) is the first row.
+        composeRule.waitUntil(15_000) { composeRule.onAllNodes(hasTestTag(MainTestTags.parkRow(104))).fetchSemanticsNodes().isNotEmpty() }
 
         composeRule.onNodeWithTag(MainTestTags.SEARCH).performTextInput("kadikoy")
-        composeRule.waitUntil(5_000) { composeRule.onAllNodes(hasTestTag(MainTestTags.parkRow(103))).fetchSemanticsNodes().isEmpty() }
+        composeRule.waitUntil(5_000) { composeRule.onAllNodes(hasTestTag(MainTestTags.parkRow(104))).fetchSemanticsNodes().isEmpty() }
 
         composeRule.onNodeWithTag(MainTestTags.parkRow(101)).performClick()
         composeRule.waitUntil(15_000) { composeRule.onAllNodes(hasText("Rıhtım Cad. No:1 Kadıköy/İstanbul")).fetchSemanticsNodes().isNotEmpty() }

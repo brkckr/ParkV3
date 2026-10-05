@@ -15,7 +15,11 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import dagger.hilt.InstallIn
 import dagger.hilt.testing.TestInstallIn
+import dagger.multibindings.IntoSet
+import okhttp3.Interceptor
+import java.io.IOException
 import javax.inject.Singleton
 
 @Module
@@ -49,4 +53,21 @@ object TestPlatformModule {
 
     @Provides
     fun provideMapAvailability(): MapAvailability = MapAvailability { MapStatus.NO_API_KEY }
+}
+
+/** Switch for simulating "no internet": requests fail with an IOException before leaving. */
+object FakeConnectivity {
+    @Volatile
+    var offline: Boolean = false
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+object TestConnectivityModule {
+    @Provides
+    @IntoSet
+    fun provideOfflineInterceptor(): Interceptor = Interceptor { chain ->
+        if (FakeConnectivity.offline) throw IOException("offline (test)")
+        chain.proceed(chain.request())
+    }
 }

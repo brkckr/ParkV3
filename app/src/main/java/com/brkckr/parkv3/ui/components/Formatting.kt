@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.pluralStringResource
@@ -24,17 +25,23 @@ import java.util.Locale
 /** Wall clock for relative times; tests provide a fixed one. */
 val LocalClock = staticCompositionLocalOf { Clock { System.currentTimeMillis() } }
 
-/** Current time, re-read every 30 s so "3 minutes ago" labels stay correct. */
+/**
+ * Current time for relative labels. Re-read immediately whenever one of [keys] (e.g. the
+ * timestamp being shown) changes, then every 30 s, so a just-downloaded list never looks
+ * like it comes from the future or reads as stale.
+ */
 @Composable
-fun rememberNow(): Long {
+fun rememberNow(vararg keys: Any?): Long {
     val clock = LocalClock.current
-    val now by produceState(clock.nowMillis(), clock) {
+    // Read synchronously in the composition that shows the new timestamp: no stale frame.
+    val anchored = remember(clock, *keys) { clock.nowMillis() }
+    val ticking by produceState(anchored, clock) {
         while (true) {
             delay(30_000)
             value = clock.nowMillis()
         }
     }
-    return now
+    return maxOf(anchored, ticking)
 }
 
 /** The UI locale, read observably so a language change recomposes formatted text. */
@@ -95,14 +102,14 @@ fun timeWithRelative(timestampMillis: Long, nowMillis: Long): String {
     val zone = ZoneId.systemDefault()
     val instant = Instant.ofEpochMilli(timestampMillis)
     val ageMillis = nowMillis - timestampMillis
-    val absolute = if (ageMillis in 0 until DAY_MS) {
+    val absolute = if (ageMillis in -60_000 until DAY_MS) {
         DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale).withZone(zone).format(instant)
     } else {
         DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT).withLocale(locale).withZone(zone).format(instant)
     }
     val minutes = (ageMillis / 60_000).toInt()
     val relative = when {
-        ageMillis < 0 || ageMillis >= DAY_MS -> return absolute
+        ageMillis < -60_000 || ageMillis >= DAY_MS -> return absolute
         minutes < 1 -> stringResource(R.string.relative_just_now)
         minutes < 60 -> pluralStringResource(R.plurals.relative_minutes, minutes, minutes)
         else -> (minutes / 60).let { hours -> pluralStringResource(R.plurals.relative_hours, hours, hours) }

@@ -1,9 +1,9 @@
 package com.brkckr.parkv3.ui.flow
 
 import androidx.compose.ui.test.assert
-import androidx.compose.ui.test.assertHeightIsAtLeast
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertWidthIsAtLeast
+import androidx.compose.ui.test.assertTouchHeightIsEqualTo
+import androidx.compose.ui.test.assertTouchWidthIsEqualTo
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
@@ -77,10 +77,11 @@ class AccessibilityAndLocaleTest {
 
         // Filter chips wrap instead of being cut off; controls keep 48dp touch targets.
         composeRule.onNodeWithText("Has free spaces").assertIsDisplayed()
-        composeRule.onNodeWithContentDescription("Refresh").assertHeightIsAtLeast(48.dp).assertWidthIsAtLeast(48.dp)
+        // Material 3 icon buttons draw 40dp but expand their touch target to 48dp.
+        composeRule.onNodeWithContentDescription("Refresh").assertTouchHeightIsEqualTo(48.dp).assertTouchWidthIsEqualTo(48.dp)
         composeRule.onNodeWithTag(MainTestTags.PARK_LIST).performScrollToNode(hasText("Kadıköy Rıhtım Otoparkı"))
         composeRule.onNodeWithText("Kadıköy Rıhtım Otoparkı").assertIsDisplayed()
-        composeRule.onNodeWithTag(MainTestTags.favoriteToggle(1)).assertHeightIsAtLeast(48.dp).assertWidthIsAtLeast(48.dp)
+        composeRule.onNodeWithTag(MainTestTags.favoriteToggle(1)).assertTouchHeightIsEqualTo(48.dp).assertTouchWidthIsEqualTo(48.dp)
     }
 
     @Test

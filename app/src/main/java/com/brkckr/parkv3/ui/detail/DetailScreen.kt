@@ -169,7 +169,7 @@ fun DetailScreen(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun DetailBody(state: DetailUiState, onRetry: () -> Unit, onDirections: () -> Unit, onShowOnMap: (() -> Unit)?) {
-    val now = rememberNow()
+    val now = rememberNow(state.detail?.fetchedAtMillis, state.listUpdatedAtMillis)
     val detail = state.detail
     Column(
         Modifier

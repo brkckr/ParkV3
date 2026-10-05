@@ -4,7 +4,6 @@ import mockwebserver3.Dispatcher
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
 import mockwebserver3.RecordedRequest
-import mockwebserver3.SocketEffect
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 
@@ -28,11 +27,22 @@ object TestServer {
         }
     }
 
-    val baseUrl: String get() = server.url("/ispark/").toString()
+    @Volatile
+    private var startedBaseUrl: String? = null
 
+    /**
+     * Read by the Hilt module when the app first needs the API, which happens on the main
+     * thread; the socket work therefore happens earlier, in [reset] on the test thread.
+     */
+    val baseUrl: String
+        get() = checkNotNull(startedBaseUrl) { "Call TestServer.reset() in @Before, before launching the app" }
+
+    /** Starts the server if needed (off the main thread) and clears all scripted responses. */
     fun reset() {
+        if (startedBaseUrl == null) startedBaseUrl = server.url("/ispark/").toString()
         queued.clear()
         fallback.clear()
+        FakeConnectivity.offline = false
     }
 
     fun enqueue(endpoint: String, vararg responses: MockResponse) {
@@ -45,6 +55,4 @@ object TestServer {
 
     fun json(body: String, code: Int = 200): MockResponse =
         MockResponse.Builder().code(code).setHeader("Content-Type", "application/json").body(body).build()
-
-    fun disconnect(): MockResponse = MockResponse.Builder().onRequestStart(SocketEffect.CloseSocket()).build()
 }

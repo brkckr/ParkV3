@@ -144,7 +144,7 @@ fun ViewModeToggle(mode: ViewMode, onChange: (ViewMode) -> Unit, modifier: Modif
  */
 @Composable
 fun FreshnessBanner(sync: SyncInfo, isRefreshing: Boolean, hasContent: Boolean, modifier: Modifier = Modifier) {
-    val now = rememberNow()
+    val now = rememberNow(sync.lastSuccessAtMillis, sync.lastAttemptAtMillis)
     val stale = hasContent && FreshnessPolicy.isListStale(sync, now)
     val error = sync.lastError
     Surface(

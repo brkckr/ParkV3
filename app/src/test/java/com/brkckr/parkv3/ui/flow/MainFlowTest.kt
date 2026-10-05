@@ -19,6 +19,7 @@ import androidx.compose.ui.test.printToString
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.brkckr.parkv3.MainActivity
+import com.brkckr.parkv3.testutil.FakeConnectivity
 import com.brkckr.parkv3.testutil.Fixtures
 import com.brkckr.parkv3.testutil.TestServer
 import com.brkckr.parkv3.ui.main.MainTestTags
@@ -92,20 +93,41 @@ class MainFlowTest {
     private fun ComposeTestRule.waitForTagGone(tag: String) =
         waitShowingTree("tag '$tag' to disappear") { onAllNodes(hasTestTag(tag)).fetchSemanticsNodes().isEmpty() }
 
+    /** List loaded: rows are sorted by Turkish alphabet, so Beşiktaş (104) comes first. */
+    private fun waitForList() = composeRule.waitForTag(MainTestTags.parkRow(104))
+
+    private fun scrollToRow(id: Int) =
+        composeRule.onNodeWithTag(MainTestTags.PARK_LIST).performScrollToNode(hasTestTag(MainTestTags.parkRow(id)))
+
     @Test
     fun firstLaunchOffline_explainsAndRetryLoadsTheList() {
-        // Every attempt fails until the "network" comes back (robust to OkHttp's own retry).
-        TestServer.always("Park", TestServer.disconnect())
+        FakeConnectivity.offline = true
+        TestServer.always("Park", TestServer.json(Fixtures.parkList))
         launch()
 
         composeRule.waitForText("No internet connection")
         composeRule.onNodeWithText("The car park list hasn't been downloaded yet", substring = true).assertIsDisplayed()
 
-        TestServer.always("Park", TestServer.json(Fixtures.parkList))
+        FakeConnectivity.offline = false
         composeRule.onNodeWithText("Try again").performClick()
 
-        composeRule.waitForTag(MainTestTags.parkRow(101))
-        composeRule.onNodeWithText("Kadıköy Rıhtım Otoparkı").assertIsDisplayed()
+        waitForList()
+        composeRule.onNodeWithText("Beşiktaş Sahil").assertIsDisplayed()
+        composeRule.onNodeWithText("Data may be out of date.").assertDoesNotExist()
+    }
+
+    @Test
+    fun cachedListStaysWhenARefreshFails() {
+        TestServer.always("Park", TestServer.json(Fixtures.parkList))
+        launch()
+        waitForList()
+
+        FakeConnectivity.offline = true
+        composeRule.onNodeWithContentDescription("Refresh").performClick()
+
+        composeRule.waitForText("You appear to be offline", substring = true)
+        composeRule.onNodeWithTag(MainTestTags.parkRow(104)).assertIsDisplayed()
+        composeRule.onNodeWithText("Data may be out of date.").assertIsDisplayed()
     }
 
     @Test
@@ -123,23 +145,25 @@ class MainFlowTest {
         TestServer.always("Park", TestServer.json(Fixtures.parkList))
         TestServer.always("ParkDetay", TestServer.json(Fixtures.parkDetail))
         launch()
-        composeRule.waitForTag(MainTestTags.parkRow(101))
+        waitForList()
 
         // Turkish-aware search typed on a non-Turkish keyboard.
         composeRule.onNodeWithTag(MainTestTags.SEARCH).performTextInput("kadikoy")
-        composeRule.waitForTagGone(MainTestTags.parkRow(103))
+        composeRule.waitForTagGone(MainTestTags.parkRow(104))
         composeRule.onNodeWithTag(MainTestTags.parkRow(101)).assertIsDisplayed()
         composeRule.onNodeWithTag(MainTestTags.SEARCH).performTextClearance()
+        waitForList()
 
         // Combined filters: open AND has free spaces.
         composeRule.onNodeWithText("Open").performClick()
         composeRule.onNodeWithText("Has free spaces").performClick()
-        composeRule.waitForTagGone(MainTestTags.parkRow(102))
+        composeRule.waitForTagGone(MainTestTags.parkRow(104)) // isOpen missing
+        composeRule.onNodeWithTag(MainTestTags.parkRow(102)).assertDoesNotExist() // full
         composeRule.onNodeWithTag(MainTestTags.parkRow(103)).assertDoesNotExist() // explicitly closed
-        composeRule.onNodeWithTag(MainTestTags.parkRow(104)).assertDoesNotExist() // isOpen missing
         composeRule.onNodeWithTag(MainTestTags.parkRow(105)).assertDoesNotExist() // inconsistent capacity
+        composeRule.onNodeWithTag(MainTestTags.parkRow(106)).assertDoesNotExist() // occupancy not reported
+        composeRule.onNodeWithTag(MainTestTags.parkRow(107)).assertIsDisplayed()
         composeRule.onNodeWithTag(MainTestTags.parkRow(101)).assertIsDisplayed()
-        composeRule.onNodeWithTag(MainTestTags.PARK_LIST).performScrollToNode(hasTestTag(MainTestTags.parkRow(107)))
 
         // Detail: address and tariff as published; favorite from the detail screen.
         composeRule.onNodeWithTag(MainTestTags.parkRow(101)).performClick()
@@ -151,7 +175,7 @@ class MainFlowTest {
         composeRule.onNodeWithContentDescription("Back").performClick()
 
         // Favorites filter now combines with the others.
-        composeRule.waitForTag(MainTestTags.SEARCH)
+        composeRule.waitForTag(MainTestTags.parkRow(107))
         composeRule.waitForIdle()
         composeRule.onNodeWithText("Favorites").performClick()
         composeRule.waitForTagGone(MainTestTags.parkRow(107))
@@ -165,8 +189,9 @@ class MainFlowTest {
         TestServer.enqueue("ParkDetay", TestServer.json("oops", code = 500))
         TestServer.always("ParkDetay", TestServer.json(Fixtures.parkDetail))
         launch()
-        composeRule.waitForTag(MainTestTags.parkRow(101))
+        waitForList()
 
+        scrollToRow(101)
         composeRule.onNodeWithTag(MainTestTags.parkRow(101)).performClick()
         composeRule.waitForText("Showing list data only", substring = true)
 
@@ -179,7 +204,7 @@ class MainFlowTest {
     fun noFavoritesYet_hasItsOwnEmptyScreen() {
         TestServer.always("Park", TestServer.json(Fixtures.parkList))
         launch()
-        composeRule.waitForTag(MainTestTags.parkRow(101))
+        waitForList()
 
         composeRule.onNodeWithText("Favorites").performClick()
 
@@ -190,7 +215,7 @@ class MainFlowTest {
     fun searchWithoutMatches_hasItsOwnEmptyScreen() {
         TestServer.always("Park", TestServer.json(Fixtures.parkList))
         launch()
-        composeRule.waitForTag(MainTestTags.parkRow(101))
+        waitForList()
 
         composeRule.onNodeWithTag(MainTestTags.SEARCH).performTextInput("zzzz")
 
