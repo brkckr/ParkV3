@@ -12,7 +12,10 @@
     <string name="filter_available">Has free spaces</string>
     <string name="filter_favorites">Favorites</string>
     <string name="filters_clear">Clear filters</string>
-    <string name="result_count">%1$d of %2$d car parks</string>
+    <plurals name="result_count">
+        <item quantity="one">%1$d of %2$d car park</item>
+        <item quantity="other">%1$d of %2$d car parks</item>
+    </plurals>
 
     <!-- Sorting / reference point -->
     <string name="sort_by_name">Sorted by name</string>
@@ -76,7 +79,10 @@
     <string name="status_closed">Closed (per source)</string>
     <string name="status_open_unknown_occupancy">Open, occupancy unknown</string>
     <string name="status_unknown">Status unknown</string>
-    <string name="occupancy_known">%1$d free of %2$d</string>
+    <plurals name="occupancy_known">
+        <item quantity="one">%1$d free space of %2$d</item>
+        <item quantity="other">%1$d free spaces of %2$d</item>
+    </plurals>
     <string name="occupancy_capacity_only">Capacity %1$d, free spaces unknown</string>
     <string name="occupancy_missing">Occupancy not reported</string>
     <string name="occupancy_inconsistent">Occupancy data inconsistent</string>
@@ -86,7 +92,6 @@
     <!-- Favorites -->
     <string name="favorite_add">Add to favorites</string>
     <string name="favorite_remove">Remove from favorites</string>
-    <string name="favorite_badge">Favorite</string>
 
     <!-- Detail -->
     <string name="detail_title">Car park details</string>
@@ -126,8 +131,10 @@
     <string name="map_set_destination">Use map centre as destination</string>
     <string name="map_destination_hint">Long-press the map or use the button to set a destination.</string>
     <string name="map_destination_marker">Selected destination</string>
-    <string name="map_cluster">%1$d car parks</string>
-    <string name="map_hidden_without_location">%1$d results have no valid location and aren\'t shown on the map.</string>
+    <plurals name="map_hidden_without_location">
+        <item quantity="one">%1$d result has no valid location and isn\'t shown on the map.</item>
+        <item quantity="other">%1$d results have no valid location and aren\'t shown on the map.</item>
+    </plurals>
     <string name="action_details">Details</string>
     <string name="action_close">Close</string>
 
@@ -145,4 +152,7 @@
     <string name="location_rationale_body">Your location is only used on this device to sort car parks by straight-line distance. You can use the app without it.</string>
     <string name="action_continue">Continue</string>
     <string name="action_not_now">Not now</string>
+
+    <!-- Required attribution for the CC BY 4.0 licensed source -->
+    <string name="data_attribution">Data: Istanbul Metropolitan Municipality (İBB) Open Data Portal, CC BY 4.0</string>
 </resources>

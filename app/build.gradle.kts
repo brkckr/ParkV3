@@ -64,7 +64,16 @@ android {
     }
 
     sourceSets {
-        getByName("androidTest").assets.directories.add("$projectDir/schemas")
+        // Test doubles, the fake server and SYNTHETIC fixtures are shared by JVM and device tests.
+        getByName("test") {
+            java.directories.add("src/sharedTest/java")
+            resources.directories.add("src/sharedTest/resources")
+        }
+        getByName("androidTest") {
+            java.directories.add("src/sharedTest/java")
+            resources.directories.add("src/sharedTest/resources")
+            assets.directories.add("$projectDir/schemas")
+        }
     }
 
     testOptions {

@@ -12,7 +12,10 @@
     <string name="filter_available">Boş yeri olan</string>
     <string name="filter_favorites">Favoriler</string>
     <string name="filters_clear">Filtreleri temizle</string>
-    <string name="result_count">%2$d otoparktan %1$d tanesi</string>
+    <plurals name="result_count">
+        <item quantity="one">%2$d otoparktan %1$d tanesi</item>
+        <item quantity="other">%2$d otoparktan %1$d tanesi</item>
+    </plurals>
 
     <!-- Sıralama / referans noktası -->
     <string name="sort_by_name">Ada göre sıralı</string>
@@ -76,7 +79,10 @@
     <string name="status_closed">Kapalı (kaynağa göre)</string>
     <string name="status_open_unknown_occupancy">Açık, doluluk bilinmiyor</string>
     <string name="status_unknown">Durum bilinmiyor</string>
-    <string name="occupancy_known">%2$d yerden %1$d boş</string>
+    <plurals name="occupancy_known">
+        <item quantity="one">%2$d yerden %1$d boş</item>
+        <item quantity="other">%2$d yerden %1$d boş</item>
+    </plurals>
     <string name="occupancy_capacity_only">Kapasite %1$d, boş yer bilinmiyor</string>
     <string name="occupancy_missing">Doluluk bildirilmedi</string>
     <string name="occupancy_inconsistent">Doluluk verisi tutarsız</string>
@@ -86,7 +92,6 @@
     <!-- Favoriler -->
     <string name="favorite_add">Favorilere ekle</string>
     <string name="favorite_remove">Favorilerden çıkar</string>
-    <string name="favorite_badge">Favori</string>
 
     <!-- Detay -->
     <string name="detail_title">Otopark detayı</string>
@@ -126,8 +131,10 @@
     <string name="map_set_destination">Harita merkezini hedef yap</string>
     <string name="map_destination_hint">Hedef seçmek için haritaya uzun basın veya düğmeyi kullanın.</string>
     <string name="map_destination_marker">Seçilen hedef</string>
-    <string name="map_cluster">%1$d otopark</string>
-    <string name="map_hidden_without_location">%1$d sonucun geçerli konumu yok, haritada gösterilmiyor.</string>
+    <plurals name="map_hidden_without_location">
+        <item quantity="one">%1$d sonucun geçerli konumu yok, haritada gösterilmiyor.</item>
+        <item quantity="other">%1$d sonucun geçerli konumu yok, haritada gösterilmiyor.</item>
+    </plurals>
     <string name="action_details">Detay</string>
     <string name="action_close">Kapat</string>
 
@@ -145,4 +152,7 @@
     <string name="location_rationale_body">Konumunuz yalnızca bu cihazda, otoparkları kuş uçuşu uzaklığa göre sıralamak için kullanılır. Uygulamayı konum olmadan da kullanabilirsiniz.</string>
     <string name="action_continue">Devam</string>
     <string name="action_not_now">Şimdi değil</string>
+
+    <!-- Required attribution for the CC BY 4.0 licensed source -->
+    <string name="data_attribution">Veri: İBB Açık Veri Portalı, CC BY 4.0</string>
 </resources>

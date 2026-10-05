@@ -42,7 +42,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
@@ -93,6 +95,7 @@ fun MainRoute(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val resources = LocalResources.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     var showRationale by rememberSaveable { mutableStateOf(false) }
@@ -108,11 +111,11 @@ fun MainRoute(
             when (event) {
                 is MainEvent.RefreshFailed -> scope.launch {
                     snackbarHostState.showSnackbar(
-                        context.getString(R.string.refresh_failed_snackbar, context.refreshErrorMessage(event.error)),
+                        resources.getString(R.string.refresh_failed_snackbar, resources.refreshErrorMessage(event.error)),
                     )
                 }
                 MainEvent.RefreshPartial -> scope.launch {
-                    snackbarHostState.showSnackbar(context.getString(R.string.refresh_partial_snackbar))
+                    snackbarHostState.showSnackbar(resources.getString(R.string.refresh_partial_snackbar))
                 }
                 MainEvent.RequestLocationPermission -> {
                     val activity = context.findActivity()
@@ -154,7 +157,7 @@ fun MainRoute(
         )
     }
 
-    val actions = remember(viewModel, context) {
+    val actions = remember(viewModel, context, resources) {
         MainActions(
             onQueryChange = viewModel::onQueryChange,
             onClearQuery = viewModel::onClearQuery,
@@ -172,9 +175,9 @@ fun MainRoute(
             onClearDestination = viewModel::onClearDestination,
             onDirections = { item ->
                 val location = item.park.location
-                val label = item.park.name ?: context.getString(R.string.park_unnamed, item.park.id)
+                val label = item.park.name ?: resources.getString(R.string.park_unnamed, item.park.id)
                 if (location == null || !context.openDirections(location, label)) {
-                    scope.launch { snackbarHostState.showSnackbar(context.getString(R.string.directions_no_app)) }
+                    scope.launch { snackbarHostState.showSnackbar(resources.getString(R.string.directions_no_app)) }
                 }
             },
             onLocate = viewModel::onLocateRequested,
@@ -233,7 +236,7 @@ fun MainScreen(state: MainUiState, actions: MainActions, snackbarHostState: Snac
                     ) {
                         if (hasContent) {
                             Text(
-                                stringResource(R.string.result_count, state.items.size, state.totalCount),
+                                pluralStringResource(R.plurals.result_count, state.totalCount, state.items.size, state.totalCount),
                                 style = MaterialTheme.typography.labelLarge,
                                 modifier = Modifier.weight(1f),
                             )

@@ -42,6 +42,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -72,6 +73,7 @@ fun DetailRoute(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val resources = LocalResources.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     LifecycleStartEffect(viewModel) {
@@ -86,9 +88,9 @@ fun DetailRoute(
         onToggleFavorite = viewModel::onToggleFavorite,
         onDirections = {
             val location = state.location
-            val label = state.name ?: context.getString(R.string.park_unnamed, state.parkId)
+            val label = state.name ?: resources.getString(R.string.park_unnamed, state.parkId)
             if (location == null || !context.openDirections(location, label)) {
-                scope.launch { snackbarHostState.showSnackbar(context.getString(R.string.directions_no_app)) }
+                scope.launch { snackbarHostState.showSnackbar(resources.getString(R.string.directions_no_app)) }
             }
         },
         onShowOnMap = if (viewModel.canShowOnMap) {
@@ -277,6 +279,12 @@ private fun DetailBody(state: DetailUiState, onRetry: () -> Unit, onDirections: 
             } else {
                 Text(stringResource(R.string.directions_unavailable_location), style = MaterialTheme.typography.bodyMedium)
             }
+            Text(
+                stringResource(R.string.data_attribution),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 24.dp),
+            )
         }
     }
 }

@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.core.net.toUri
 import com.brkckr.parkv3.domain.model.GeoPoint
 import java.util.Locale
 
@@ -18,13 +19,13 @@ object DirectionsIntents {
     private fun GeoPoint.coordinates() = String.format(Locale.US, "%.6f,%.6f", latitude, longitude)
 
     fun webUri(destination: GeoPoint): Uri =
-        Uri.parse("https://www.google.com/maps/dir/?api=1&destination=${destination.coordinates()}&travelmode=driving")
+        "https://www.google.com/maps/dir/?api=1&destination=${destination.coordinates()}&travelmode=driving".toUri()
 
     fun candidates(destination: GeoPoint, label: String): List<Intent> {
         val coordinates = destination.coordinates()
         return listOf(
             Intent(Intent.ACTION_VIEW, webUri(destination)).setPackage(GOOGLE_MAPS_PACKAGE),
-            Intent(Intent.ACTION_VIEW, Uri.parse("geo:$coordinates?q=$coordinates(${Uri.encode(label)})")),
+            Intent(Intent.ACTION_VIEW, "geo:$coordinates?q=$coordinates(${Uri.encode(label)})".toUri()),
             Intent(Intent.ACTION_VIEW, webUri(destination)).addCategory(Intent.CATEGORY_BROWSABLE),
         )
     }

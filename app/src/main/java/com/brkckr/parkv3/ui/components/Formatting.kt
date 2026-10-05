@@ -1,6 +1,6 @@
 package com.brkckr.parkv3.ui.components
 
-import android.content.Context
+import android.content.res.Resources
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
@@ -42,8 +42,8 @@ fun rememberNow(): Long {
 @ReadOnlyComposable
 fun currentLocale(): Locale = LocalConfiguration.current.locales[0]
 
-/** Non-composable variant for snackbars and other one-off messages. */
-fun Context.refreshErrorMessage(error: RefreshError): String = when (error) {
+/** Non-composable variant for snackbars; pass LocalResources.current from composition. */
+fun Resources.refreshErrorMessage(error: RefreshError): String = when (error) {
     RefreshError.Network -> getString(R.string.error_network)
     is RefreshError.Http -> getString(R.string.error_http, error.code)
     RefreshError.Malformed -> getString(R.string.error_malformed)
@@ -79,7 +79,7 @@ fun distanceText(meters: Double): String = if (meters < 1_000) {
 @Composable
 @ReadOnlyComposable
 fun occupancyText(occupancy: Occupancy, capacity: Int?): String = when (occupancy) {
-    is Occupancy.Known -> stringResource(R.string.occupancy_known, occupancy.empty, occupancy.capacity)
+    is Occupancy.Known -> pluralStringResource(R.plurals.occupancy_known, occupancy.empty, occupancy.empty, occupancy.capacity)
     Occupancy.Missing -> if (capacity != null && capacity > 0) {
         stringResource(R.string.occupancy_capacity_only, capacity)
     } else {

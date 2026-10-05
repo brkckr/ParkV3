@@ -80,6 +80,14 @@ fun ParkList(
                     onToggleFavorite = { onToggleFavorite(item.park.id, !item.isFavorite) },
                 )
             }
+            item(key = "attribution") {
+                Text(
+                    stringResource(R.string.data_attribution),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 8.dp),
+                )
+            }
             if (showOrphans && orphanFavorites.isNotEmpty()) {
                 item(key = "orphans_header") {
                     Text(
