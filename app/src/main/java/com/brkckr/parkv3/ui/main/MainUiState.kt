@@ -2,6 +2,7 @@ package com.brkckr.parkv3.ui.main
 
 import com.brkckr.parkv3.domain.ParkFilters
 import com.brkckr.parkv3.domain.ParkListItem
+import com.brkckr.parkv3.domain.model.AreaPolygon
 import com.brkckr.parkv3.domain.model.GeoPoint
 import com.brkckr.parkv3.domain.model.OrphanFavorite
 import com.brkckr.parkv3.domain.model.RefreshError
@@ -41,6 +42,8 @@ data class MainUiState(
     val favoriteCount: Int = 0,
     val orphanFavorites: List<OrphanFavorite> = emptyList(),
     val selectedParkId: Int? = null,
+    /** Area outline of the selected park from its cached detail; empty if unknown or invalid. */
+    val selectedArea: List<AreaPolygon> = emptyList(),
     val destination: GeoPoint? = null,
     val location: LocationStatus = LocationStatus.Idle,
     /** Persisted sync bookkeeping (content freshness). */

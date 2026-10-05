@@ -62,6 +62,7 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.Polygon
 import com.google.maps.android.compose.clustering.Clustering
 import com.google.maps.android.compose.rememberCameraPositionState
 
@@ -139,6 +140,19 @@ private fun GoogleParkMap(
             onMapClick = { onSelectPark(null) },
             onMapLongClick = { onSetDestination(GeoPoint(it.latitude, it.longitude)) },
         ) {
+            // Outline of the selected park, only when it passed validation (docs/adr/0012).
+            if (selected != null) {
+                val outline = MaterialTheme.colorScheme.primary
+                state.selectedArea.forEach { area ->
+                    Polygon(
+                        points = area.outer.map { it.toLatLng() },
+                        holes = area.holes.map { ring -> ring.map { it.toLatLng() } },
+                        fillColor = outline.copy(alpha = 0.2f),
+                        strokeColor = outline,
+                        strokeWidth = 4f,
+                    )
+                }
+            }
             Clustering(
                 items = clusterItems,
                 onClusterClick = { cluster ->

@@ -4,7 +4,8 @@
 uygulaması (Kotlin, Jetpack Compose).
 
 - Konumunuza veya haritada seçtiğiniz bir hedefe göre **kuş uçuşu** yakınlık sıralaması
-- Harita (kümelenmiş) ve liste görünümü, ortak filtre ve seçim
+- Harita (kümelenmiş) ve liste görünümü, ortak filtre ve seçim. Seçili otoparkın alanı,
+  kaynakta varsa ve doğrulamadan geçerse haritada çiziliyor
 - Otopark adı ve ilçe araması. Türkçe karakter ve büyük/küçük harf duyarsız
   (`kadikoy` → `KADIKÖY`)
 - Birlikte çalışan filtreler: **Açık**, **Boş yeri olan**, **Favoriler**
@@ -109,7 +110,8 @@ GitHub Actions iş akışları:
   (kaynağa göre)" olarak gösteriyor ve çalışma saatinden açıklık hesaplamıyor.
 - Ücret alanlarının birimi belgelenmemiş. Tarife metni olduğu gibi gösteriliyor, "saatlik"
   gibi etiketler eklenmiyor. `freeTime` birimsiz ham sayı olarak gösteriliyor.
-- Otopark alan poligonları saklanıyor ama çizilmiyor.
+- Alan yalnızca detayı indirilmiş otoparklar için çiziliyor. Haritada seçim, eksik detayı
+  bir kez indiriyor. Doğrulamadan geçmeyen alan hiç çizilmiyor.
 - Harita işaretleri ekran okuyucuyla sınırlı kullanılabiliyor. Erişilebilir alternatif
   liste görünümü.
 - Adres araması yok (ücretli servis kararı gerekiyor). Hedef haritadan seçiliyor.

@@ -166,8 +166,9 @@ class ParkJsonParserTest {
         val expected = ZonedDateTime.of(2026, 10, 4, 14, 2, 30, 0, ZoneId.of("Europe/Istanbul")).toInstant().toEpochMilli()
         assertThat(detail.sourceUpdatedAt).isEqualTo(SourceTimestamp("04.10.2026 14:02:30", expected))
         assertThat(parsed.rawTariff).startsWith("0-1 Saat : 40,00;")
-        // Kept verbatim; never reinterpreted.
+        // Stored verbatim; the area is read from it in WKT order (longitude, latitude).
         assertThat(parsed.rawAreaPolygon).startsWith("POLYGON ((29.0230 40.9900")
+        assertThat(detail.area.single().outer.first()).isEqualTo(GeoPoint(40.9900, 29.0230))
     }
 
     @Test

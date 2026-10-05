@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.brkckr.parkv3.domain.ParkFilters
 import com.brkckr.parkv3.domain.ParkListQuery
 import com.brkckr.parkv3.domain.ParkRepository
+import com.brkckr.parkv3.domain.model.AreaPolygon
 import com.brkckr.parkv3.domain.model.FreshnessPolicy
 import com.brkckr.parkv3.domain.model.GeoPoint
 import com.brkckr.parkv3.domain.model.OrphanFavorite
@@ -18,13 +19,20 @@ import com.brkckr.parkv3.location.LocationStatus
 import com.brkckr.parkv3.ui.map.MapAvailability
 import com.brkckr.parkv3.ui.map.MapStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -89,7 +97,12 @@ class MainViewModel @Inject constructor(
         repository.isRefreshingList,
     ) { parks, favoriteIds, orphans, sync, refreshing -> Content(parks, favoriteIds, orphans, sync, refreshing) }
 
-    val uiState: StateFlow<MainUiState> = combine(controls, content, location) { c, data, loc ->
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val selectedArea: Flow<List<AreaPolygon>> = selectedParkId.flatMapLatest { id ->
+        if (id == null) flowOf(emptyList()) else repository.observeDetail(id).map { it?.area.orEmpty() }
+    }
+
+    val uiState: StateFlow<MainUiState> = combine(controls, content, location, selectedArea) { c, data, loc, area ->
         val reference = c.destination ?: (loc as? LocationStatus.Available)?.point
         MainUiState(
             query = c.query,
@@ -100,6 +113,7 @@ class MainViewModel @Inject constructor(
             favoriteCount = data.favoriteIds.size,
             orphanFavorites = data.orphans,
             selectedParkId = c.selectedParkId,
+            selectedArea = area,
             destination = c.destination,
             location = loc,
             sync = data.sync,
@@ -120,6 +134,15 @@ class MainViewModel @Inject constructor(
         // Cold start: fetch unless the cache is fresh. Foreground returns are handled app-wide.
         viewModelScope.launch {
             repository.refreshParksIfOlderThan(FreshnessPolicy.LIST_AUTO_REFRESH_AFTER_MS)
+        }
+        // A park selected on the map gets its detail once, so its area outline can be drawn.
+        // Failures stay silent: the selection card shows the list data either way.
+        viewModelScope.launch {
+            combine(selectedParkId, viewMode) { id, mode -> id.takeIf { mode == ViewMode.MAP.name } }
+                .distinctUntilChanged()
+                .collectLatest { id ->
+                    if (id != null && repository.observeDetail(id).first() == null) repository.refreshDetail(id)
+                }
         }
     }
 

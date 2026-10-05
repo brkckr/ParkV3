@@ -24,9 +24,14 @@ data class ParkDetail(
     val sourceUpdatedAt: SourceTimestamp?,
     /** Device time of the successful detail fetch. */
     val fetchedAtMillis: Long,
+    /** Parking area outline; empty unless it passed validation (docs/adr/0012). */
+    val area: List<AreaPolygon> = emptyList(),
 ) {
     val occupancy: Occupancy get() = Occupancy.of(capacity, emptyCapacity)
 }
+
+/** One polygon of a parking area: [outer] boundary and [holes], in valid Istanbul coordinates. */
+data class AreaPolygon(val outer: List<GeoPoint>, val holes: List<List<GeoPoint>> = emptyList())
 
 /** One tariff line split at its first ':' ("0-1 Saat : 110,00"); [value] is null without one. */
 data class TariffLine(val label: String, val value: String?)

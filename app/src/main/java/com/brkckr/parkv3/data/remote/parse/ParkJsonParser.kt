@@ -88,6 +88,8 @@ object ParkJsonParser {
         val id = f.int("parkID", "parkId", "id")
         if (id == null || id <= 0 || id != requestedId) return DetailParseResult.NotFound
         val tariff = f.string("tariff")
+        val polygon = f.string("areaPolygon")
+        val point = location(f)
         val detail = ParkDetail(
             parkId = id,
             name = f.string("parkName"),
@@ -95,7 +97,7 @@ object ParkJsonParser {
             address = f.string("address"),
             parkType = f.string("parkType"),
             workHours = f.string("workHours"),
-            location = location(f),
+            location = point,
             capacity = f.int("capacity"),
             emptyCapacity = f.int("emptyCapacity"),
             freeTime = f.int("freeTime"),
@@ -103,8 +105,9 @@ object ParkJsonParser {
             tariffLines = tariffLines(tariff),
             sourceUpdatedAt = f.string("updateDate")?.let(::parseSourceTimestamp),
             fetchedAtMillis = fetchedAtMillis,
+            area = AreaPolygonParser.parse(polygon, point),
         )
-        return DetailParseResult.Parsed(ParsedDetail(detail, tariff, f.string("areaPolygon")))
+        return DetailParseResult.Parsed(ParsedDetail(detail, tariff, polygon))
     }
 
     /** "0-1 Saat : 110,00;Tam Gün : 370,00" → lines split at ';' and then at the first ':'. */

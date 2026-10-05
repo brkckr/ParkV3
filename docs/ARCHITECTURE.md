@@ -10,7 +10,8 @@ com.brkckr.parkv3
 │   ├── ParkListQuery  Filtre (VE), Türkçe arama, sıralama, haversine mesafe
 │   └── ParkRepository Arayüz (observe* + refresh*)
 ├── data/
-│   ├── remote/        Retrofit API (JsonElement), tip toleranslı ayrıştırıcı, uzak kaynak
+│   ├── remote/        Retrofit API (JsonElement), tip toleranslı ayrıştırıcı, WKT alan
+│   │                  ayrıştırıcı (doğrulamalı), uzak kaynak
 │   ├── sync/          ListSyncPolicy: yanıt kabul/ret ve küçülme koruması.
 │   │                  ListRefreshTriggers: ön plana gelişte ve yeniden bağlanınca yenileme
 │   ├── local/         Room varlıkları, DAO (tek transaction'lı senkron), eşleyiciler
