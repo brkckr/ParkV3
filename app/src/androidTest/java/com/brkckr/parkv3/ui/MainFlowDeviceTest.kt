@@ -1,6 +1,7 @@
 package com.brkckr.parkv3.ui
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
@@ -65,6 +66,11 @@ class MainFlowDeviceTest {
         composeRule.waitForIdle()
 
         composeRule.onNodeWithContentDescription("Add to favorites").performClick()
+        // The write goes through Room on a background thread before the toggle flips; Compose's
+        // idling does not wait for it.
+        composeRule.waitUntil(5_000) {
+            composeRule.onAllNodes(hasContentDescription("Remove from favorites")).fetchSemanticsNodes().isNotEmpty()
+        }
         composeRule.onNodeWithContentDescription("Remove from favorites").assertIsDisplayed()
         composeRule.onNodeWithContentDescription("Back").performClick()
         composeRule.waitForIdle()

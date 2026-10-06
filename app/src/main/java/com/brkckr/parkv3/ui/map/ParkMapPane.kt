@@ -30,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,6 +48,7 @@ import com.brkckr.parkv3.ui.components.StatusBadge
 import com.brkckr.parkv3.ui.components.distanceText
 import com.brkckr.parkv3.ui.components.occupancyText
 import com.brkckr.parkv3.ui.components.parkName
+import com.brkckr.parkv3.ui.components.rememberTouchExplorationEnabled
 import com.brkckr.parkv3.ui.components.statusStyle
 import com.brkckr.parkv3.ui.main.EmptyState
 import com.brkckr.parkv3.ui.main.MainTestTags
@@ -56,6 +58,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.clustering.ClusterItem
+import com.google.maps.android.clustering.view.DefaultClusterRenderer
 import com.google.maps.android.compose.Circle
 import com.google.maps.android.compose.ComposeMapColorScheme
 import com.google.maps.android.compose.GoogleMap
@@ -65,6 +68,8 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.Polygon
 import com.google.maps.android.compose.clustering.Clustering
+import com.google.maps.android.compose.clustering.rememberClusterManager
+import com.google.maps.android.compose.clustering.rememberClusterRenderer
 import com.google.maps.android.compose.rememberCameraPositionState
 
 private val ISTANBUL = LatLng(41.0082, 28.9784)
@@ -130,6 +135,7 @@ private fun GoogleParkMap(
         }
     }
     val hiddenCount = state.items.size - clusterItems.size
+    val screenReaderOn = rememberTouchExplorationEnabled()
     val selected = state.selectedItem
     val userPoint = (state.location as? LocationStatus.Available)?.point
 
@@ -164,21 +170,37 @@ private fun GoogleParkMap(
                     )
                 }
             }
-            Clustering(
-                items = clusterItems,
-                onClusterClick = { cluster ->
+            // The renderer is taken out of Clustering so that clustering can be turned off while
+            // a screen reader is on (minClusterSize, docs/adr/0016).
+            val clusterManager = rememberClusterManager<ParkClusterItem>()
+            val renderer = rememberClusterRenderer(
+                clusterContent = { cluster -> ClusterBubble(cluster.size) },
+                clusterItemContent = { clusterItem -> ParkPin(clusterItem.item, clusterItem.selected) },
+                clusterManager = clusterManager,
+            )
+            val defaultMinClusterSize = remember(renderer) { (renderer as? DefaultClusterRenderer<*>)?.minClusterSize }
+            SideEffect {
+                val manager = clusterManager ?: return@SideEffect
+                if (renderer != null && manager.renderer != renderer) manager.renderer = renderer
+                manager.setOnClusterClickListener { cluster ->
                     cameraPositionState.move(
                         CameraUpdateFactory.newLatLngZoom(cluster.position, cameraPositionState.position.zoom + 2f),
                     )
                     true
-                },
-                onClusterItemClick = { clusterItem ->
+                }
+                manager.setOnClusterItemClickListener { clusterItem ->
                     onSelectPark(clusterItem.item.park.id)
                     true
-                },
-                clusterContent = { cluster -> ClusterBubble(cluster.size) },
-                clusterItemContent = { clusterItem -> ParkPin(clusterItem.item, clusterItem.selected) },
-            )
+                }
+            }
+            LaunchedEffect(renderer, screenReaderOn) {
+                val defaultRenderer = renderer as? DefaultClusterRenderer<*> ?: return@LaunchedEffect
+                defaultRenderer.minClusterSize = minClusterSize(screenReaderOn, defaultMinClusterSize ?: return@LaunchedEffect)
+                clusterManager?.cluster()
+            }
+            if (clusterManager != null) {
+                Clustering(items = clusterItems, clusterManager = clusterManager)
+            }
             state.destination?.let { destination ->
                 val markerState = remember(destination) { MarkerState(position = destination.toLatLng()) }
                 Marker(

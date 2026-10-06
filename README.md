@@ -118,7 +118,8 @@ GitHub Actions iş akışları:
   gibi etiketler eklenmiyor. `freeTime` birimsiz ham sayı olarak gösteriliyor.
 - Alan yalnızca detayı indirilmiş otoparklar için çiziliyor. Haritada seçim, eksik detayı
   bir kez indiriyor. Doğrulamadan geçmeyen alan hiç çizilmiyor.
-- Harita işaretleri ekran okuyucuya ad, durum ve doluluk bilgisini veriyor, ancak bunun
-  TalkBack ile okunuşu gerçek cihazda denenmedi. Küme balonlarının etiketi yok. Tam
-  erişilebilir alternatif liste görünümü.
+- Harita işaretleri ekran okuyucuya ad, durum ve doluluk bilgisini veriyor. Küme balonlarının
+  etiketi olmadığı için TalkBack açıkken kümeleme kapatılıyor
+  ([ADR-0016](docs/adr/0016-ekran-okuyucuda-kumeleme-yok.md)). Bunun TalkBack ile okunuşu
+  gerçek cihazda denenmedi. Tam erişilebilir alternatif liste görünümü.
 - Adres araması yok (ücretli servis kararı gerekiyor). Hedef haritadan seçiliyor.
