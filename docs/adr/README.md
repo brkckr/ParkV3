@@ -17,3 +17,4 @@
 | [0013](0013-uygulama-ici-dil.md) | Uygulama içi dil seçimi (AppCompat uygulama başına dil) | Kabul |
 | [0014](0014-isopen-kullanilmiyor.md) | Kaynağın `isOpen` alanı kullanılmıyor, uygunluk yalnızca doluluktan | Kabul |
 | [0015](0015-target-sdk-37.md) | targetSdk 37: Android 17 davranış değişiklikleri, sertifika şeffaflığı kontrolü (API 37 emülatörü denendi, kaldırıldı) | Kabul |
+| [0016](0016-ekran-okuyucuda-kumeleme-yok.md) | Ekran okuyucu açıkken haritada kümeleme yok | Kabul |

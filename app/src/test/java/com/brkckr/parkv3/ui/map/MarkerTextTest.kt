@@ -34,6 +34,12 @@ class MarkerTextTest {
     }
 
     @Test
+    fun `nothing is clustered while a screen reader is on`() {
+        assertThat(minClusterSize(screenReaderOn = false, default = 4)).isEqualTo(4)
+        assertThat(minClusterSize(screenReaderOn = true, default = 4)).isEqualTo(Int.MAX_VALUE)
+    }
+
+    @Test
     @Config(qualifiers = "tr")
     fun `pin text follows the app language`() {
         val text = resources.markerText(park(7, name = null, emptyCapacity = 30))
